@@ -28,38 +28,51 @@ export const metadata = {
     apple: [{ url: '/icon.png', sizes: '64x64' }]
   },
   title: {
-    default: 'Arcana Noire | Tarot Guidance',
-    template: '%s | Arcana Noire'
+    default: 'Free Tarot Reading Online | 3-Card Tarot Spread',
+    template: '%s | Tarot Reading Online'
   },
   description:
-    'Arcana Noire is a high-end online tarot reading experience with structured three-card guidance for real-world decisions.',
+    'Free online tarot reading with a three-card spread. Ask one question and get clear past, present, future guidance for love, career, and life decisions.',
   keywords: [
     'free tarot reading online',
+    'tarot reading free',
     'tarot reading online',
+    'online tarot card reading',
+    'tarot yes or no',
+    'love tarot reading',
+    'career tarot reading',
+    'daily tarot reading',
+    'tarot cards meaning',
+    'tarot spread for beginners',
+    'three card tarot spread online',
     'three card tarot spread',
     'past present future tarot',
-    'tarot spread',
-    'spiritual reflection app',
-    'divination website',
-    'oracle guidance'
+    'how to read tarot cards',
+    'upright and reversed tarot',
+    'best tarot reading website',
+    'online divination',
+    '塔罗在线占卜',
+    '免费塔罗',
+    '三张牌塔罗',
+    '塔罗牌解读'
   ],
   alternates: {
     canonical: '/'
   },
   openGraph: {
-    title: 'Arcana Noire | Free Online Tarot Reading',
+    title: 'Free Tarot Reading Online | 3-Card Tarot Spread',
     description:
-      'Get a free online tarot reading with a structured three-card spread and clear reflective guidance.',
+      'Free online tarot reading for love, career, and life. Try a practical three-card spread with clear guidance.',
     url: siteUrl,
-    siteName: 'Arcana Noire',
+    siteName: 'Tarot Reading Online',
     locale: 'en_US',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Arcana Noire | Free Online Tarot Reading',
+    title: 'Free Tarot Reading Online | 3-Card Tarot Spread',
     description:
-      'Get a free online tarot reading with a structured three-card spread and clear reflective guidance.'
+      'Free online tarot reading for love, career, and life. Try a practical three-card spread with clear guidance.'
   },
   robots: {
     index: true,

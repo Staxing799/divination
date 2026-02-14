@@ -7,17 +7,17 @@ export default function HomePage() {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Arcana Noire',
+    name: 'Free Tarot Reading Online',
     url: siteUrl,
     description:
-      'A high-end Tarot ritual experience for reflective decision support.',
+      'Free online tarot reading with practical three-card guidance for real decisions.',
     inLanguage: ['en', 'zh', 'es', 'ja']
   };
 
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Arcana Noire',
+    name: 'Online Tarot Reading Tool',
     applicationCategory: 'LifestyleApplication',
     operatingSystem: 'Web',
     offers: {
@@ -36,7 +36,7 @@ export default function HomePage() {
         name: 'What is the best way to do an online tarot reading?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Use one clear question and a structured spread. Arcana Noire uses a three-card Past, Present, Future layout with upright and reversed card orientation.'
+          text: 'Use one clear question and a structured spread. This tool uses a three-card Past, Present, Future layout with upright and reversed card orientation.'
         }
       },
       {

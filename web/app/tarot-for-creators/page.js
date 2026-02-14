@@ -4,14 +4,14 @@ import { resolveSiteUrl } from '../../lib/site-url';
 const siteUrl = resolveSiteUrl();
 
 export const metadata = {
-  title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
+  title: 'Tarot for Work Decisions | Creators, Founders, and Entrepreneurs',
   description:
     'Use Tarot as a reflection framework for product strategy, creative blocks, timing, and difficult decisions in work and life.',
   alternates: {
     canonical: '/tarot-for-creators'
   },
   openGraph: {
-    title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
+    title: 'Tarot for Work Decisions | Creators, Founders, and Entrepreneurs',
     description:
       'Use Tarot as a reflection framework for strategy, timing, and difficult creative decisions.',
     url: `${siteUrl}/tarot-for-creators`,
@@ -19,7 +19,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
+    title: 'Tarot for Work Decisions | Creators, Founders, and Entrepreneurs',
     description:
       'Use Tarot as a reflection framework for strategy, timing, and difficult creative decisions.'
   },
@@ -27,7 +27,13 @@ export const metadata = {
     'tarot for creators',
     'tarot for entrepreneurs',
     'tarot for business decisions',
-    'creative block tarot reading'
+    'creative block tarot reading',
+    'career decision tarot reading',
+    'startup founder tarot guidance',
+    'product strategy tarot',
+    'work and life tarot reading',
+    '事业塔罗',
+    '工作决策塔罗'
   ]
 };
 
