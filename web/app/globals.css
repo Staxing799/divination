@@ -697,6 +697,102 @@ textarea:focus {
   background: rgba(89, 23, 44, 0.92);
 }
 
+.seo-home-shell {
+  max-width: 1240px;
+  margin: 1rem auto 0;
+  position: relative;
+  z-index: 1;
+  padding: 0 0.2rem;
+}
+
+.seo-home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.seo-home-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(236, 198, 108, 0.24);
+  background: rgba(16, 8, 35, 0.76);
+  padding: 0.85rem 0.9rem;
+}
+
+.seo-home-card h2 {
+  margin: 0;
+  color: #ffe8b1;
+  font-family: var(--font-heading), serif;
+  font-size: 1.15rem;
+}
+
+.seo-home-card p {
+  margin: 0.46rem 0 0;
+  color: #d8caef;
+  line-height: 1.62;
+  font-size: 0.88rem;
+}
+
+.seo-home-card a {
+  display: inline-block;
+  margin-top: 0.58rem;
+  color: #ffe0a1;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 224, 161, 0.5);
+}
+
+.seo-page {
+  min-height: 100vh;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 6.2rem 1rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.seo-hero,
+.seo-section {
+  border-radius: 1rem;
+  border: 1px solid rgba(236, 198, 108, 0.24);
+  background: rgba(17, 9, 37, 0.78);
+  padding: 1rem;
+}
+
+.seo-section {
+  margin-top: 0.65rem;
+}
+
+.seo-hero h1 {
+  margin: 0;
+  font-family: var(--font-heading), serif;
+  color: #ffe8b1;
+  font-size: clamp(1.7rem, 4.2vw, 2.4rem);
+}
+
+.seo-hero p,
+.seo-section p {
+  margin: 0.55rem 0 0;
+  color: #d7cbef;
+  line-height: 1.72;
+}
+
+.seo-section h2 {
+  margin: 0;
+  color: #ffe7b9;
+  font-family: var(--font-heading), serif;
+  font-size: clamp(1.2rem, 3vw, 1.55rem);
+}
+
+.seo-cta {
+  margin-top: 0.8rem;
+  display: inline-block;
+  text-decoration: none;
+  color: #2b153e;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold), var(--gold-strong));
+  border-radius: 999px;
+  padding: 0.62rem 0.95rem;
+}
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.58;
@@ -731,6 +827,10 @@ button:disabled {
   .top-tools {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .seo-home-grid {
+    grid-template-columns: 1fr;
   }
 
   .option-grid {
