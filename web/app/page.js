@@ -9,7 +9,7 @@ export default function HomePage() {
     name: 'Nebula Arcana',
     url: siteUrl,
     description:
-      'A premium, international divination experience combining Tarot, I Ching, and Eastern insight for reflective decision support.',
+      'A premium, international Tarot experience for reflective decision support.',
     inLanguage: ['en', 'zh', 'es', 'ja']
   };
 

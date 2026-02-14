@@ -1,8 +1,10 @@
+import { formatSpreadForPrompt } from './tarot';
+
 export function buildSystemPrompt(locale) {
   const language = languageName(locale);
   const headings = sectionHeadings(locale);
 
-  return `You are an elite cross-tradition divination consultant for a premium global product.
+  return `You are an elite tarot consultant for a premium global product.
 Target audience: young professionals and creative users who want high-quality spiritual reflection with practical direction.
 
 Non-negotiable rules:
@@ -15,22 +17,23 @@ Non-negotiable rules:
 7) Use this exact section structure and order:
 ${headings}
 8) Action guidance must be specific, time-bounded, and realistic.
-9) Integrate symbolic insight with practical execution advice.
+9) Interpret only the exact drawn cards and positions provided by the user context. Never invent extra cards.
 10) In the final "Legal Notice" section, clearly state:
    - This reading is for entertainment and self-reflection only.
    - User should consult licensed professionals for medical, legal, and financial decisions.
    - Service is intended for users age 18+.`;
 }
 
-export function buildUserPrompt({ type, question, birthDate, locale }) {
-  const framework = frameworkPrompt(type);
-  const birthText = birthDate ? birthDate.toISOString().slice(0, 10) : 'not provided';
+export function buildUserPrompt({ question, locale, spread }) {
+  const framework = frameworkPrompt();
+  const drawnCards = formatSpreadForPrompt(spread);
 
   return `User context:
-- Divination type: ${type}
+- Divination type: TAROT
 - User question: ${question}
-- Birth date: ${birthText}
 - Locale code: ${locale}
+- Drawn spread:
+${drawnCards}
 
 Generation objective:
 Deliver a premium reading that feels insightful, modern, and emotionally precise.
@@ -44,26 +47,12 @@ Output quality bar:
 - End with one short signature line that is uplifting but not generic.`;
 }
 
-function frameworkPrompt(type) {
-  switch (type) {
-    case 'TAROT':
-      return `Divination framework: Tarot.
+function frameworkPrompt() {
+  return `Divination framework: Tarot.
 Use a 3-card spread (Past / Present / Future).
+For each position, interpret the provided card with its exact orientation (upright/reversed).
 For each card, provide symbolic interpretation + one grounded action cue.
 Keep archetypes vivid but professional.`;
-    case 'EASTERN_FATE':
-      return `Divination framework: Eastern fate reading.
-Integrate five elements, yin-yang balance, and cycle momentum.
-Use birth-date context when available, but avoid overclaiming precision.
-Translate metaphysics into practical weekly strategy.`;
-    case 'I_CHING':
-      return `Divination framework: I Ching-inspired reading.
-Provide a plausible hexagram number and name.
-Explain core meaning, transition signal, and response strategy.
-Focus on timing, restraint, and leverage points.`;
-    default:
-      return 'Divination framework: mixed symbolic reflection with practical guidance.';
-  }
 }
 
 function languageName(locale) {

@@ -11,13 +11,10 @@ import {
   me,
   register
 } from '../lib/api';
+import { unpackTarotResult } from '../lib/tarot-payload';
 import { COPY, normalizeLanguage, SUPPORTED_LANGUAGES, translate } from '../lib/locale';
 
-const READING_TYPES = [
-  { id: 'TAROT', key: 'tarot' },
-  { id: 'EASTERN_FATE', key: 'eastern' },
-  { id: 'I_CHING', key: 'iching' }
-];
+const READING_TYPES = [{ id: 'TAROT', key: 'tarot' }];
 
 const LANGUAGE_LABELS = {
   en: 'EN',
@@ -30,21 +27,14 @@ const INITIAL_AUTH_FORM = {
   displayName: '',
   email: '',
   password: '',
-  age18Confirmed: false,
   entertainmentOnlyAccepted: false,
-  advisoryNoticeAccepted: false
-};
-
-const INITIAL_LEGAL_FORM = {
   age18Confirmed: false,
-  entertainmentOnlyAccepted: false,
   advisoryNoticeAccepted: false
 };
 
 const INITIAL_READING_FORM = {
   type: 'TAROT',
-  question: '',
-  birthDate: ''
+  question: ''
 };
 
 function formatDate(isoText, language) {
@@ -62,6 +52,18 @@ function formatDate(isoText, language) {
   }
 }
 
+function normalizeReadingRecord(record) {
+  if (!record) return record;
+  if (record.tarotMeta !== undefined) return record;
+
+  const parsed = unpackTarotResult(record.resultText);
+  return {
+    ...record,
+    resultText: parsed.text,
+    tarotMeta: parsed.meta?.spread?.cards || []
+  };
+}
+
 export default function OracleConsole() {
   const [hydrated, setHydrated] = useState(false);
   const [language, setLanguage] = useState('en');
@@ -74,15 +76,14 @@ export default function OracleConsole() {
 
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState(INITIAL_AUTH_FORM);
-  const [legalForm, setLegalForm] = useState(INITIAL_LEGAL_FORM);
   const [readingForm, setReadingForm] = useState(INITIAL_READING_FORM);
 
   const [booting, setBooting] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [readingBusy, setReadingBusy] = useState(false);
-  const [legalBusy, setLegalBusy] = useState(false);
   const [historyBusy, setHistoryBusy] = useState(false);
   const [removingId, setRemovingId] = useState(null);
+  const [ritualTick, setRitualTick] = useState(0);
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -93,7 +94,6 @@ export default function OracleConsole() {
   const copy = useMemo(() => COPY[language] || COPY.en, [language]);
   const t = (key, vars) => translate(language, key, vars);
   const authenticated = Boolean(token);
-  const legalReady = Boolean(user?.legalReady);
   const typeLabel = (type) => {
     const matched = READING_TYPES.find((item) => item.id === type);
     return matched ? copy[matched.key] : type;
@@ -170,7 +170,22 @@ export default function OracleConsole() {
         if (canceled) {
           return;
         }
-        setUser(profile);
+        if (profile?.legalReady) {
+          setUser(profile);
+        } else {
+          const consented = await acceptLegalConsent(
+            {
+              age18Confirmed: true,
+              entertainmentOnlyAccepted: true,
+              advisoryNoticeAccepted: true
+            },
+            token,
+            language
+          );
+          if (!canceled) {
+            setUser(consented);
+          }
+        }
         applyHistory(records);
       } catch (err) {
         if (canceled) {
@@ -195,23 +210,13 @@ export default function OracleConsole() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated, token, language]);
 
-  useEffect(() => {
-    if (!authenticated || !user || legalReady) {
-      return;
-    }
-    setLegalForm({
-      age18Confirmed: Boolean(user.age18Confirmed),
-      entertainmentOnlyAccepted: Boolean(user.entertainmentOnlyAccepted),
-      advisoryNoticeAccepted: Boolean(user.advisoryNoticeAccepted)
-    });
-  }, [authenticated, legalReady, user]);
-
   function applyHistory(items) {
-    setHistory(items);
+    const normalized = items.map(normalizeReadingRecord);
+    setHistory(normalized);
     if (!activeHistoryId) {
       return;
     }
-    const selected = items.find((item) => item.id === activeHistoryId);
+    const selected = normalized.find((item) => item.id === activeHistoryId);
     if (!selected) {
       if (result?.id === activeHistoryId) {
         setResult(null);
@@ -245,7 +250,6 @@ export default function OracleConsole() {
     setResult(null);
     setActiveHistoryId(null);
     setAuthForm(INITIAL_AUTH_FORM);
-    setLegalForm(INITIAL_LEGAL_FORM);
     setReadingForm(INITIAL_READING_FORM);
     setError('');
     setMessage('');
@@ -281,9 +285,9 @@ export default function OracleConsole() {
             password: authForm.password,
             displayName: authForm.displayName,
             locale: language,
-            age18Confirmed: authForm.age18Confirmed,
+            age18Confirmed: authForm.entertainmentOnlyAccepted,
             entertainmentOnlyAccepted: authForm.entertainmentOnlyAccepted,
-            advisoryNoticeAccepted: authForm.advisoryNoticeAccepted
+            advisoryNoticeAccepted: authForm.entertainmentOnlyAccepted
           }
         : {
             email: authForm.email,
@@ -305,34 +309,9 @@ export default function OracleConsole() {
     }
   }
 
-  async function onLegalSubmit(event) {
-    event.preventDefault();
-    if (!token) {
-      return;
-    }
-
-    setLegalBusy(true);
-    setError('');
-    setMessage('');
-
-    try {
-      const profile = await acceptLegalConsent(legalForm, token, language);
-      setUser(profile);
-      flash(t('legalGateSaved'));
-    } catch (err) {
-      setError(err.message || t('errorRequestFallback'));
-    } finally {
-      setLegalBusy(false);
-    }
-  }
-
   async function onReadingSubmit(event) {
     event.preventDefault();
     if (!token) {
-      return;
-    }
-    if (!legalReady) {
-      setError(t('legalGateNeededError'));
       return;
     }
 
@@ -345,25 +324,25 @@ export default function OracleConsole() {
     setReadingBusy(true);
     setError('');
     setMessage('');
+    setRitualTick((value) => value + 1);
+    setResult(null);
 
     try {
       const data = await createDivination(
         {
           type: readingForm.type,
           question,
-          birthDate: readingForm.birthDate || null,
           locale: language
         },
         token,
         language
       );
 
-      setResult(data);
+      setResult(normalizeReadingRecord(data));
       setActiveHistoryId(data.id);
       setReadingForm((prev) => ({
         ...prev,
-        question: '',
-        birthDate: prev.type === 'EASTERN_FATE' ? prev.birthDate : ''
+        question: ''
       }));
 
       const records = await getDivinationHistory(token, language);
@@ -426,9 +405,13 @@ export default function OracleConsole() {
   }
 
   function viewHistory(item) {
-    setResult(item);
+    setResult(normalizeReadingRecord(item));
     setActiveHistoryId(item.id);
   }
+
+  const ritualCards = readingBusy && !result
+    ? [{}, {}, {}]
+    : (result?.tarotMeta || []);
 
   return (
     <div className="site-shell">
@@ -438,7 +421,9 @@ export default function OracleConsole() {
 
       <header className="topbar">
         <div className="brand-block">
-          <span className="brand-mark">✦</span>
+          <span className="brand-mark" aria-hidden="true">
+            <img src="/nebula-arcana-mark.svg" alt="" />
+          </span>
           <div>
             <h1>{copy.brandName}</h1>
             <p>{copy.brandTagline}</p>
@@ -446,7 +431,6 @@ export default function OracleConsole() {
         </div>
 
         <div className="top-tools">
-          <span className="legal-chip">{copy.legalBadge}</span>
           <div className="lang-switch" role="group" aria-label={copy.localeLabel}>
             {SUPPORTED_LANGUAGES.map((code) => (
               <button
@@ -485,109 +469,93 @@ export default function OracleConsole() {
 
         {!authenticated && (
           <section ref={authPanelRef} className="card auth-card">
-            <div className="section-head">
-              <h3>{copy.authPanelTitle}</h3>
+            <div className="auth-ornament" aria-hidden="true">
+              <span className="auth-ornament-line" />
+              <p>GRAND SALON</p>
+              <span className="auth-ornament-line" />
             </div>
-            <p className="muted">{copy.authHint}</p>
+            <div className="auth-inner">
+              <div className="section-head">
+                <h3>{copy.authPanelTitle}</h3>
+              </div>
+              <p className="muted">{copy.authHint}</p>
 
-            <div className="tab-row">
-              <button
-                type="button"
-                className={authMode === 'login' ? 'tab-btn active' : 'tab-btn'}
-                onClick={() => setAuthMode('login')}
-              >
-                {copy.signIn}
-              </button>
-              <button
-                type="button"
-                className={authMode === 'register' ? 'tab-btn active' : 'tab-btn'}
-                onClick={() => setAuthMode('register')}
-              >
-                {copy.signUp}
-              </button>
-            </div>
+              <div className="tab-row">
+                <button
+                  type="button"
+                  className={authMode === 'login' ? 'tab-btn active' : 'tab-btn'}
+                  onClick={() => setAuthMode('login')}
+                >
+                  {copy.signIn}
+                </button>
+                <button
+                  type="button"
+                  className={authMode === 'register' ? 'tab-btn active' : 'tab-btn'}
+                  onClick={() => setAuthMode('register')}
+                >
+                  {copy.signUp}
+                </button>
+              </div>
 
-            <form className="form-grid" onSubmit={onAuthSubmit}>
-              {authMode === 'register' && (
+              <form className="form-grid" onSubmit={onAuthSubmit}>
+                {authMode === 'register' && (
+                  <label>
+                    <span>{copy.displayName}</span>
+                    <input
+                      required
+                      value={authForm.displayName}
+                      onChange={(event) =>
+                        setAuthForm((prev) => ({ ...prev, displayName: event.target.value }))
+                      }
+                    />
+                  </label>
+                )}
+
                 <label>
-                  <span>{copy.displayName}</span>
+                  <span>{copy.email}</span>
                   <input
+                    type="email"
                     required
-                    value={authForm.displayName}
-                    onChange={(event) =>
-                      setAuthForm((prev) => ({ ...prev, displayName: event.target.value }))
-                    }
+                    value={authForm.email}
+                    onChange={(event) => setAuthForm((prev) => ({ ...prev, email: event.target.value }))}
                   />
                 </label>
-              )}
 
-              <label>
-                <span>{copy.email}</span>
-                <input
-                  type="email"
-                  required
-                  value={authForm.email}
-                  onChange={(event) => setAuthForm((prev) => ({ ...prev, email: event.target.value }))}
-                />
-              </label>
+                <label>
+                  <span>{copy.password}</span>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={authForm.password}
+                    onChange={(event) => setAuthForm((prev) => ({ ...prev, password: event.target.value }))}
+                  />
+                </label>
 
-              <label>
-                <span>{copy.password}</span>
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={authForm.password}
-                  onChange={(event) => setAuthForm((prev) => ({ ...prev, password: event.target.value }))}
-                />
-              </label>
+                {authMode === 'register' && (
+                  <div className="legal-box">
+                    <label className="checkbox-row">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={authForm.entertainmentOnlyAccepted}
+                        onChange={(event) =>
+                          setAuthForm((prev) => ({
+                            ...prev,
+                            entertainmentOnlyAccepted: event.target.checked
+                          }))
+                        }
+                      />
+                      <span>{copy.confirmEntertainment}</span>
+                    </label>
+                  </div>
+                )}
 
-              {authMode === 'register' && (
-                <div className="legal-box">
-                  <p>{copy.registerLegalTitle}</p>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={authForm.age18Confirmed}
-                      onChange={(event) =>
-                        setAuthForm((prev) => ({ ...prev, age18Confirmed: event.target.checked }))
-                      }
-                    />
-                    <span>{copy.confirmAge18}</span>
-                  </label>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={authForm.entertainmentOnlyAccepted}
-                      onChange={(event) =>
-                        setAuthForm((prev) => ({
-                          ...prev,
-                          entertainmentOnlyAccepted: event.target.checked
-                        }))
-                      }
-                    />
-                    <span>{copy.confirmEntertainment}</span>
-                  </label>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={authForm.advisoryNoticeAccepted}
-                      onChange={(event) =>
-                        setAuthForm((prev) => ({ ...prev, advisoryNoticeAccepted: event.target.checked }))
-                      }
-                    />
-                    <span>{copy.confirmAdviceLimits}</span>
-                  </label>
-                </div>
-              )}
-
-              <button type="submit" className="primary-btn" disabled={authBusy}>
-                {authBusy ? copy.loading : authMode === 'register' ? copy.signUp : copy.signIn}
-              </button>
-            </form>
+                <button type="submit" className="primary-btn" disabled={authBusy}>
+                  {authBusy ? copy.loading : authMode === 'register' ? copy.signUp : copy.signIn}
+                </button>
+              </form>
+            </div>
           </section>
         )}
 
@@ -595,106 +563,33 @@ export default function OracleConsole() {
           <>
             <section className="card reading-card">
               <div className="section-head">
-                <h3>{legalReady ? copy.dashboardTitle : copy.legalGateTitle}</h3>
+                <h3>{copy.dashboardTitle}</h3>
                 <button type="button" className="ghost-btn" onClick={refreshHistory}>
                   {copy.refresh}
                 </button>
               </div>
               <p className="muted">{copy.dashboardSubtitle}</p>
 
-              {legalReady ? (
-                <form className="form-grid" onSubmit={onReadingSubmit}>
-                  <div>
-                    <span className="field-label">{copy.readingType}</span>
-                    <div className="option-grid">
-                      {READING_TYPES.map((type) => (
-                        <button
-                          key={type.id}
-                          type="button"
-                          className={readingForm.type === type.id ? 'option-btn active' : 'option-btn'}
-                          onClick={() => setReadingForm((prev) => ({ ...prev, type: type.id }))}
-                        >
-                          {copy[type.key]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <form className="form-grid" onSubmit={onReadingSubmit}>
+                <div className="field-label">{copy.tarot}</div>
 
-                  <label>
-                    <span>{copy.questionLabel}</span>
-                    <textarea
-                      required
-                      minLength={3}
-                      maxLength={500}
-                      value={readingForm.question}
-                      onChange={(event) =>
-                        setReadingForm((prev) => ({ ...prev, question: event.target.value }))
-                      }
-                    />
-                  </label>
+                <label>
+                  <span>{copy.questionLabel}</span>
+                  <textarea
+                    required
+                    minLength={3}
+                    maxLength={500}
+                    value={readingForm.question}
+                    onChange={(event) =>
+                      setReadingForm((prev) => ({ ...prev, question: event.target.value }))
+                    }
+                  />
+                </label>
 
-                  {readingForm.type === 'EASTERN_FATE' && (
-                    <label>
-                      <span>{copy.birthDate}</span>
-                      <input
-                        type="date"
-                        value={readingForm.birthDate}
-                        onChange={(event) =>
-                          setReadingForm((prev) => ({ ...prev, birthDate: event.target.value }))
-                        }
-                      />
-                    </label>
-                  )}
-
-                  <button type="submit" className="primary-btn" disabled={readingBusy}>
-                    {readingBusy ? copy.loading : copy.generateReading}
-                  </button>
-                </form>
-              ) : (
-                <form className="form-grid" onSubmit={onLegalSubmit}>
-                  <p className="muted">{copy.legalGateDesc}</p>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={legalForm.age18Confirmed}
-                      onChange={(event) =>
-                        setLegalForm((prev) => ({ ...prev, age18Confirmed: event.target.checked }))
-                      }
-                    />
-                    <span>{copy.confirmAge18}</span>
-                  </label>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={legalForm.entertainmentOnlyAccepted}
-                      onChange={(event) =>
-                        setLegalForm((prev) => ({
-                          ...prev,
-                          entertainmentOnlyAccepted: event.target.checked
-                        }))
-                      }
-                    />
-                    <span>{copy.confirmEntertainment}</span>
-                  </label>
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={legalForm.advisoryNoticeAccepted}
-                      onChange={(event) =>
-                        setLegalForm((prev) => ({ ...prev, advisoryNoticeAccepted: event.target.checked }))
-                      }
-                    />
-                    <span>{copy.confirmAdviceLimits}</span>
-                  </label>
-
-                  <button type="submit" className="primary-btn" disabled={legalBusy}>
-                    {legalBusy ? copy.loading : copy.legalGateAction}
-                  </button>
-                </form>
-              )}
+                <button type="submit" className="primary-btn" disabled={readingBusy}>
+                  {readingBusy ? copy.loading : copy.generateReading}
+                </button>
+              </form>
             </section>
 
             <section className="card result-card">
@@ -704,14 +599,39 @@ export default function OracleConsole() {
 
               {result ? (
                 <article className="result-content">
+                  {result?.tarotMeta?.length > 0 && (
+                    <div className="tarot-stage" key={`${result.id}-${ritualTick}`}>
+                      {result.tarotMeta.map((card, index) => (
+                        <article
+                          key={`${card.cardId}-${card.position}-${index}`}
+                          className={`tarot-card ${card.orientation === 'REVERSED' ? 'reversed' : ''}`}
+                          style={{ '--delay': `${index * 140}ms` }}
+                        >
+                          <p className="tarot-pos">{t(`tarotPos${card.position}`)}</p>
+                          <h4>{card.name}</h4>
+                          <span>{card.orientation === 'REVERSED' ? copy.tarotReversed : copy.tarotUpright}</span>
+                        </article>
+                      ))}
+                    </div>
+                  )}
                   <p className="result-meta">{typeLabel(result.type)} · {formatDate(result.createdAt, language)}</p>
                   <pre>{result.resultText}</pre>
                 </article>
               ) : (
-                <p className="muted">{copy.emptyReading}</p>
+                <>
+                  {ritualCards.length > 0 && (
+                    <div className="tarot-stage" key={`ritual-${ritualTick}`}>
+                      {ritualCards.map((_, index) => (
+                        <article key={`ritual-card-${index}`} className="tarot-card is-loading" style={{ '--delay': `${index * 120}ms` }}>
+                          <div className="tarot-back-star" />
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                  <p className="muted">{readingBusy ? copy.tarotShuffling : copy.emptyReading}</p>
+                </>
               )}
 
-              <p className="result-hint">{copy.legalResultHint}</p>
             </section>
 
             <section className="card history-card">
@@ -765,13 +685,6 @@ export default function OracleConsole() {
           </>
         )}
       </main>
-
-      <footer className="site-footer">
-        <p>{copy.legalNoticeEntertainment}</p>
-        <p>{copy.legalNoticeAdvice}</p>
-        <p>{copy.legalNoticeAdults}</p>
-        <p className="footer-line">{copy.footerLine}</p>
-      </footer>
 
       {(booting || error || message) && (
         <div className={error ? 'status-bar error' : 'status-bar'}>{booting ? copy.loading : error || message}</div>

@@ -2,7 +2,7 @@ import { ApiError } from './errors';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const DIVINATION_TYPES = ['TAROT', 'EASTERN_FATE', 'I_CHING'];
+export const DIVINATION_TYPES = ['TAROT'];
 
 export function normalizeLocale(value) {
   const input = String(value || '').trim().toLowerCase();
@@ -91,8 +91,8 @@ export function validateLegalConsentPayload(payload) {
 }
 
 export function validateDivinationPayload(payload) {
-  const type = String(payload?.type || '').trim();
-  if (!DIVINATION_TYPES.includes(type)) {
+  const type = 'TAROT';
+  if (payload?.type && String(payload.type).trim() !== 'TAROT') {
     throw new ApiError(400, 'validation.type.required');
   }
 
@@ -101,19 +101,10 @@ export function validateDivinationPayload(payload) {
     throw new ApiError(400, 'validation.question.length');
   }
 
-  let birthDate = null;
-  if (payload?.birthDate) {
-    const parsed = new Date(String(payload.birthDate));
-    if (Number.isNaN(parsed.getTime())) {
-      throw new ApiError(400, 'validation.birth_date.invalid');
-    }
-    birthDate = parsed;
-  }
-
   return {
     type,
     question,
-    birthDate,
+    birthDate: null,
     locale: normalizeLocale(payload?.locale)
   };
 }

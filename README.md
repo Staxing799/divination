@@ -15,7 +15,7 @@ Production-ready international divination app for Vercel deployment.
 
 1. User signs up/signs in and gets JWT.
 2. User completes legal consent gate (or provides it at sign-up).
-3. User submits divination request (`Tarot / Eastern Fate / I Ching`).
+3. User submits a Tarot divination request.
 4. Backend generates AI reading (fallback if provider fails).
 5. Result is persisted and shown in history.
 6. User can view, delete one record, or clear all history.

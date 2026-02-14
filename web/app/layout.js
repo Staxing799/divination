@@ -17,16 +17,23 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '64x64' }
+    ],
+    shortcut: ['/favicon.ico'],
+    apple: [{ url: '/icon.png', sizes: '64x64' }]
+  },
   title: {
-    default: 'Nebula Arcana | Tarot, I Ching, and Eastern Guidance',
+    default: 'Nebula Arcana | Tarot Guidance',
     template: '%s | Nebula Arcana'
   },
   description:
-    'Nebula Arcana is an international divination web experience for creators, founders, and reflective minds. Get Tarot, I Ching, and Eastern guidance in a cinematic interface.',
+    'Nebula Arcana is an international Tarot web experience for creators, founders, and reflective minds. Get cinematic Tarot guidance with modern clarity.',
   keywords: [
     'tarot reading online',
-    'i ching reading',
-    'eastern fate reading',
+    'tarot spread',
     'spiritual reflection app',
     'divination website',
     'oracle guidance'
@@ -37,7 +44,7 @@ export const metadata = {
   openGraph: {
     title: 'Nebula Arcana',
     description:
-      'Tarot, I Ching, and Eastern divination in a premium international web experience.',
+      'Premium international Tarot divination in a cinematic web experience.',
     url: siteUrl,
     siteName: 'Nebula Arcana',
     locale: 'en_US',
@@ -47,7 +54,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Nebula Arcana',
     description:
-      'Tarot, I Ching, and Eastern divination in a premium international web experience.'
+      'Premium international Tarot divination in a cinematic web experience.'
   },
   robots: {
     index: true,

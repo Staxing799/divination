@@ -1,0 +1,28 @@
+<svg width="1180" height="320" viewBox="0 0 1180 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(120 104) rotate(48) scale(220)">
+      <stop stop-color="#2A1452"/>
+      <stop offset="1" stop-color="#0E081F"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="24" y1="16" x2="260" y2="260" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8DEA2"/>
+      <stop offset="0.5" stop-color="#E7B868"/>
+      <stop offset="1" stop-color="#C8923B"/>
+    </linearGradient>
+    <linearGradient id="textgold" x1="290" y1="72" x2="1060" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7DEAA"/>
+      <stop offset="1" stop-color="#D19E4B"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="10" y="10" width="300" height="300" rx="84" fill="url(#bg)"/>
+  <circle cx="160" cy="160" r="92" stroke="url(#gold)" stroke-width="12"/>
+  <path d="M160 80L176 143L240 160L176 177L160 240L144 177L80 160L144 143L160 80Z" fill="url(#gold)"/>
+  <circle cx="160" cy="52" r="6" fill="url(#gold)"/>
+  <circle cx="268" cy="160" r="6" fill="url(#gold)"/>
+  <circle cx="160" cy="268" r="6" fill="url(#gold)"/>
+  <circle cx="52" cy="160" r="6" fill="url(#gold)"/>
+
+  <text x="352" y="140" fill="url(#textgold)" font-family="Cormorant Garamond, Georgia, serif" font-size="94" letter-spacing="4">NEBULA ARCANA</text>
+  <text x="356" y="192" fill="#C5B6DE" font-family="Manrope, 'Segoe UI', sans-serif" font-size="30" letter-spacing="9">TAROT · I CHING · EASTERN FATE</text>
+</svg>
