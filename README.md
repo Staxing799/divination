@@ -71,7 +71,7 @@ APP_AI_TIMEOUT_MS=15000
    - local: `npm run db:push`
    - or with Vercel deploy hook using same command
 
-No local file DB is used.
+No local file DB is used
 
 ## API endpoints
 
