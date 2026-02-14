@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum DivinationType {
+  TAROT
+  EASTERN_FATE
+  I_CHING
+}
+
+enum CreditSource {
+  ONE_OFF
+  SUBSCRIPTION
+}
+
+model User {
+  id                        Int               @id @default(autoincrement())
+  email                     String            @unique
+  passwordHash              String
+  displayName               String
+  locale                    String            @default("en")
+  age18Confirmed            Boolean           @default(false)
+  entertainmentOnlyAccepted Boolean           @default(false)
+  advisoryNoticeAccepted    Boolean           @default(false)
+  legalConsentAcceptedAt    DateTime?
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  divinationRecords         DivinationRecord[]
+
+  @@map("users")
+}
+
+model DivinationRecord {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         DivinationType
+  consumedFrom CreditSource   @default(ONE_OFF)
+  question     String         @db.VarChar(500)
+  birthDate    DateTime?      @db.Date
+  locale       String         @default("en")
+  resultText   String
+  createdAt    DateTime       @default(now())
+
+  @@index([userId, createdAt])
+  @@map("divination_records")
+}
