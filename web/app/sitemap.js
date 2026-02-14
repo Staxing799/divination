@@ -1,5 +1,7 @@
+import { resolveSiteUrl } from '../lib/site-url';
+
 export default function sitemap() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+  const siteUrl = resolveSiteUrl();
   const now = new Date();
 
   return [

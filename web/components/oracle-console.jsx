@@ -12,7 +12,9 @@ import {
   register
 } from '../lib/api';
 import { unpackTarotResult } from '../lib/tarot-payload';
-import { COPY, normalizeLanguage, SUPPORTED_LANGUAGES, translate } from '../lib/locale';
+import { COPY, SUPPORTED_LANGUAGES, translate } from '../lib/locale';
+import { useLanguage } from './language-provider';
+import HomeSeoContent from './home-seo-content';
 
 const READING_TYPES = [{ id: 'TAROT', key: 'tarot' }];
 
@@ -65,8 +67,7 @@ function normalizeReadingRecord(record) {
 }
 
 export default function OracleConsole() {
-  const [hydrated, setHydrated] = useState(false);
-  const [language, setLanguage] = useState('en');
+  const { language, setLanguage, hydrated } = useLanguage();
 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
@@ -83,6 +84,7 @@ export default function OracleConsole() {
   const [readingBusy, setReadingBusy] = useState(false);
   const [historyBusy, setHistoryBusy] = useState(false);
   const [removingId, setRemovingId] = useState(null);
+  const [confirmingClear, setConfirmingClear] = useState(false);
   const [ritualTick, setRitualTick] = useState(0);
 
   const [error, setError] = useState('');
@@ -114,31 +116,11 @@ export default function OracleConsole() {
       return;
     }
 
-    const savedLanguage = localStorage.getItem('oracle_locale');
-    const preferredLanguage = savedLanguage || navigator.language || 'en';
-    setLanguage(normalizeLanguage(preferredLanguage));
-
     const savedToken = localStorage.getItem('oracle_token');
     if (savedToken) {
       setToken(savedToken);
     }
-
-    setHydrated(true);
   }, []);
-
-  useEffect(() => {
-    if (!hydrated || typeof window === 'undefined') {
-      return;
-    }
-    localStorage.setItem('oracle_locale', language);
-  }, [hydrated, language]);
-
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-    document.documentElement.lang = language;
-  }, [language]);
 
   useEffect(() => {
     return () => {
@@ -251,6 +233,7 @@ export default function OracleConsole() {
     setActiveHistoryId(null);
     setAuthForm(INITIAL_AUTH_FORM);
     setReadingForm(INITIAL_READING_FORM);
+    setConfirmingClear(false);
     setError('');
     setMessage('');
   }
@@ -379,15 +362,17 @@ export default function OracleConsole() {
     }
   }
 
+  function requestClearHistory() {
+    if (!token || history.length === 0 || historyBusy) {
+      return;
+    }
+    setConfirmingClear(true);
+  }
+
   async function onClearHistory() {
     if (!token || history.length === 0 || historyBusy) {
       return;
     }
-
-    if (!window.confirm(t('clearHistoryConfirm'))) {
-      return;
-    }
-
     setHistoryBusy(true);
     setError('');
 
@@ -396,6 +381,7 @@ export default function OracleConsole() {
       setHistory([]);
       setResult(null);
       setActiveHistoryId(null);
+      setConfirmingClear(false);
       flash(t('historyCleared', { count: payload?.deletedCount ?? 0 }));
     } catch (err) {
       setError(err.message || t('errorRequestFallback'));
@@ -451,9 +437,16 @@ export default function OracleConsole() {
         </div>
       </header>
 
-      <main className="content-wrap">
+      <main className={authenticated ? 'content-wrap is-auth' : 'content-wrap'}>
+        {authenticated && (
+          <>
+            <div className="ritual-aura ritual-aura-left" aria-hidden="true" />
+            <div className="ritual-aura ritual-aura-right" aria-hidden="true" />
+          </>
+        )}
         {!authenticated && (
           <section className="hero-card card">
+            <p className="hero-kicker">{copy.brandName}</p>
             <div className="hero-chip-row">
               <span>{copy.heroAudience1}</span>
               <span>{copy.heroAudience2}</span>
@@ -461,9 +454,12 @@ export default function OracleConsole() {
             </div>
             <h2>{copy.heroTitle}</h2>
             <p>{copy.heroSubtitle}</p>
-            <button type="button" className="primary-btn" onClick={scrollToAuth}>
-              {copy.heroCta}
-            </button>
+            <div className="hero-cta-row">
+              <button type="button" className="primary-btn" onClick={scrollToAuth}>
+                {copy.heroCta}
+              </button>
+              <p className="hero-trust">{copy.heroTrust}</p>
+            </div>
           </section>
         )}
 
@@ -471,7 +467,7 @@ export default function OracleConsole() {
           <section ref={authPanelRef} className="card auth-card">
             <div className="auth-ornament" aria-hidden="true">
               <span className="auth-ornament-line" />
-              <p>GRAND SALON</p>
+              <p>{copy.authOrnament}</p>
               <span className="auth-ornament-line" />
             </div>
             <div className="auth-inner">
@@ -640,7 +636,7 @@ export default function OracleConsole() {
                 <button
                   type="button"
                   className="ghost-btn"
-                  onClick={onClearHistory}
+                  onClick={requestClearHistory}
                   disabled={historyBusy || history.length === 0}
                 >
                   {historyBusy ? copy.loading : copy.clearHistory}
@@ -685,12 +681,41 @@ export default function OracleConsole() {
           </>
         )}
       </main>
+      {!authenticated && <HomeSeoContent />}
+
+      {confirmingClear && (
+        <div className="ritual-modal-backdrop" role="presentation" onClick={() => setConfirmingClear(false)}>
+          <section
+            className="ritual-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={copy.clearHistoryDialogTitle}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h4>{copy.clearHistoryDialogTitle}</h4>
+            <p>{copy.clearHistoryDialogBody || copy.clearHistoryConfirm}</p>
+            <div className="ritual-modal-actions">
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => setConfirmingClear(false)}
+                disabled={historyBusy}
+              >
+                {copy.cancel}
+              </button>
+              <button type="button" className="danger-btn" onClick={onClearHistory} disabled={historyBusy}>
+                {historyBusy ? copy.loading : copy.confirmClearHistory}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {(booting || error || message) && (
         <div className={error ? 'status-bar error' : 'status-bar'}>{booting ? copy.loading : error || message}</div>
       )}
 
-      {!hydrated && <div className="status-bar">Loading...</div>}
+      {!hydrated && <div className="status-bar">{copy.globalLoading}</div>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import Link from 'next/link';
+import TarotReadingOnlineContent from '../../components/tarot-reading-online-content';
+import { resolveSiteUrl } from '../../lib/site-url';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+const siteUrl = resolveSiteUrl();
 
 export const metadata = {
   title: 'Free Tarot Reading Online | 3-Card Spread for Clarity',
@@ -8,6 +9,19 @@ export const metadata = {
     'Get a free online Tarot reading with a structured 3-card spread (Past, Present, Future). Designed for creators, founders, and professionals making real decisions.',
   alternates: {
     canonical: '/tarot-reading-online'
+  },
+  openGraph: {
+    title: 'Free Tarot Reading Online | 3-Card Spread for Clarity',
+    description:
+      'Get a free online Tarot reading with a structured 3-card spread (Past, Present, Future).',
+    url: `${siteUrl}/tarot-reading-online`,
+    type: 'article'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free Tarot Reading Online | 3-Card Spread for Clarity',
+    description:
+      'Get a free online Tarot reading with a structured 3-card spread (Past, Present, Future).'
   },
   keywords: [
     'free tarot reading online',
@@ -60,47 +74,10 @@ export default function TarotReadingOnlinePage() {
   };
 
   return (
-    <main className="seo-page">
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-
-      <section className="seo-hero">
-        <h1>Free Tarot Reading Online for Real-World Decisions</h1>
-        <p>
-          Nebula Arcana gives you a structured <strong>online Tarot reading</strong> with a classic
-          <strong> 3-card spread</strong>. It is built for people who want practical clarity in love, work,
-          and life direction.
-        </p>
-        <Link className="seo-cta" href="/">
-          Start Your Tarot Reading
-        </Link>
-      </section>
-
-      <section className="seo-section">
-        <h2>Why This Tarot Reading Is Different</h2>
-        <p>
-          Instead of vague one-line fortune text, this flow uses a Past-Present-Future spread and keeps the
-          interpretation grounded in action. Each card orientation (upright or reversed) changes the meaning,
-          so you get a reading that matches proper Tarot usage.
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>Best Questions to Ask in a Tarot Session</h2>
-        <p>
-          Strong questions improve reading quality. Ask about one decision, one conflict, or one opportunity.
-          Avoid yes/no wording. Example: “What should I focus on in the next 30 days to improve my career
-          direction?”
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>Who This Is For</h2>
-        <p>
-          This reading style is designed for creators, startup founders, product builders, and reflective
-          professionals who want insight with structure.
-        </p>
-      </section>
-    </main>
+      <TarotReadingOnlineContent />
+    </>
   );
 }

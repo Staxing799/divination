@@ -1,4 +1,7 @@
-import Link from 'next/link';
+import TarotForCreatorsContent from '../../components/tarot-for-creators-content';
+import { resolveSiteUrl } from '../../lib/site-url';
+
+const siteUrl = resolveSiteUrl();
 
 export const metadata = {
   title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
@@ -6,6 +9,19 @@ export const metadata = {
     'Use Tarot as a reflection framework for product strategy, creative blocks, timing, and difficult decisions in work and life.',
   alternates: {
     canonical: '/tarot-for-creators'
+  },
+  openGraph: {
+    title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
+    description:
+      'Use Tarot as a reflection framework for strategy, timing, and difficult creative decisions.',
+    url: `${siteUrl}/tarot-for-creators`,
+    type: 'article'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tarot for Creators and Founders | Clarity for Work and Strategy',
+    description:
+      'Use Tarot as a reflection framework for strategy, timing, and difficult creative decisions.'
   },
   keywords: [
     'tarot for creators',
@@ -16,42 +32,5 @@ export const metadata = {
 };
 
 export default function TarotForCreatorsPage() {
-  return (
-    <main className="seo-page">
-      <section className="seo-hero">
-        <h1>Tarot for Creators, Builders, and Founders</h1>
-        <p>
-          Nebula Arcana focuses on modern users who want structured reflection. This is
-          <strong> Tarot for decision quality</strong>, not passive fortune consumption.
-        </p>
-        <Link className="seo-cta" href="/">
-          Start a Focused Reading
-        </Link>
-      </section>
-
-      <section className="seo-section">
-        <h2>Use Cases That Convert Insight Into Action</h2>
-        <p>
-          Product direction, co-founder conflict, hiring uncertainty, launch timing, creative paralysis,
-          and relationship stress are all high-leverage reading prompts.
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>How to Ask Better Questions</h2>
-        <p>
-          Ask process-focused questions: “What pattern am I missing?” “What risk should I reduce first?”
-          “Where should I focus this week?” This creates clearer card interpretation.
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>What to Expect From Nebula Arcana</h2>
-        <p>
-          A cinematic Tarot experience, structured spread logic, and practical guidance in plain language for
-          global users across English, Chinese, Spanish, and Japanese.
-        </p>
-      </section>
-    </main>
-  );
+  return <TarotForCreatorsContent />;
 }

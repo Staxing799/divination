@@ -1,5 +1,7 @@
 import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
+import { LanguageProvider } from '../components/language-provider';
+import { resolveSiteUrl } from '../lib/site-url';
 
 const headingFont = Cormorant_Garamond({
   subsets: ['latin'],
@@ -13,7 +15,7 @@ const bodyFont = Manrope({
   variable: '--font-body'
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+const siteUrl = resolveSiteUrl();
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -26,13 +28,16 @@ export const metadata = {
     apple: [{ url: '/icon.png', sizes: '64x64' }]
   },
   title: {
-    default: 'Nebula Arcana | Tarot Guidance',
-    template: '%s | Nebula Arcana'
+    default: 'Arcana Noire | Tarot Guidance',
+    template: '%s | Arcana Noire'
   },
   description:
-    'Nebula Arcana is an international Tarot web experience for creators, founders, and reflective minds. Get cinematic Tarot guidance with modern clarity.',
+    'Arcana Noire is a high-end online tarot reading experience with structured three-card guidance for real-world decisions.',
   keywords: [
+    'free tarot reading online',
     'tarot reading online',
+    'three card tarot spread',
+    'past present future tarot',
     'tarot spread',
     'spiritual reflection app',
     'divination website',
@@ -42,19 +47,19 @@ export const metadata = {
     canonical: '/'
   },
   openGraph: {
-    title: 'Nebula Arcana',
+    title: 'Arcana Noire | Free Online Tarot Reading',
     description:
-      'Premium international Tarot divination in a cinematic web experience.',
+      'Get a free online tarot reading with a structured three-card spread and clear reflective guidance.',
     url: siteUrl,
-    siteName: 'Nebula Arcana',
+    siteName: 'Arcana Noire',
     locale: 'en_US',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Nebula Arcana',
+    title: 'Arcana Noire | Free Online Tarot Reading',
     description:
-      'Premium international Tarot divination in a cinematic web experience.'
+      'Get a free online tarot reading with a structured three-card spread and clear reflective guidance.'
   },
   robots: {
     index: true,
@@ -65,7 +70,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${bodyFont.variable} ${headingFont.variable}`}>{children}</body>
+      <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

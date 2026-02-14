@@ -1,4 +1,7 @@
-import Link from 'next/link';
+import ThreeCardTarotContent from '../../components/three-card-tarot-content';
+import { resolveSiteUrl } from '../../lib/site-url';
+
+const siteUrl = resolveSiteUrl();
 
 export const metadata = {
   title: 'Three Card Tarot Spread Meaning | Past Present Future Guide',
@@ -6,6 +9,19 @@ export const metadata = {
     'Learn how a three-card Tarot spread works and how to read Past, Present, Future positions with upright and reversed cards.',
   alternates: {
     canonical: '/three-card-tarot-spread'
+  },
+  openGraph: {
+    title: 'Three Card Tarot Spread Meaning | Past Present Future Guide',
+    description:
+      'Learn how to read Past, Present, Future positions with upright and reversed Tarot cards.',
+    url: `${siteUrl}/three-card-tarot-spread`,
+    type: 'article'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Three Card Tarot Spread Meaning | Past Present Future Guide',
+    description:
+      'Learn how to read Past, Present, Future positions with upright and reversed Tarot cards.'
   },
   keywords: [
     'three card tarot spread',
@@ -16,42 +32,5 @@ export const metadata = {
 };
 
 export default function ThreeCardTarotSpreadPage() {
-  return (
-    <main className="seo-page">
-      <section className="seo-hero">
-        <h1>Three Card Tarot Spread: Past, Present, Future</h1>
-        <p>
-          The <strong>three card Tarot spread</strong> is one of the most useful layouts for decision support.
-          It balances speed and depth while staying practical.
-        </p>
-        <Link className="seo-cta" href="/">
-          Try the 3-Card Spread
-        </Link>
-      </section>
-
-      <section className="seo-section">
-        <h2>Card Position Meaning</h2>
-        <p>
-          Past shows momentum and context. Present shows your active tension. Future shows the likely direction
-          if the current pattern continues.
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>Upright vs Reversed Cards</h2>
-        <p>
-          Upright cards describe direct expression. Reversed cards often indicate blocked energy, delay,
-          internal conflict, or overcorrection. Orientation must be interpreted with position, not in isolation.
-        </p>
-      </section>
-
-      <section className="seo-section">
-        <h2>How to Use This in Daily Life</h2>
-        <p>
-          After receiving your spread, choose one action for the next 24 to 72 hours. This creates measurable
-          momentum and turns reflection into execution.
-        </p>
-      </section>
-    </main>
-  );
+  return <ThreeCardTarotContent />;
 }
