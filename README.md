@@ -89,4 +89,4 @@ No local file DB is used.
 ## Notes
 
 - Backend is fully implemented with Next.js Route Handlers in `web/app/api`.
-- Free mode is enabled (no payment deduction, no usage ledger).
+- Free mode is enabled (no payment deduction, no usage ledger)
