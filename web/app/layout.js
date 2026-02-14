@@ -1,4 +1,5 @@
 import { Cormorant_Garamond, Manrope } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { LanguageProvider } from '../components/language-provider';
 import { resolveSiteUrl } from '../lib/site-url';
@@ -16,6 +17,7 @@ const bodyFont = Manrope({
 });
 
 const siteUrl = resolveSiteUrl();
+const GA_MEASUREMENT_ID = 'G-VPXXRX0KSE';
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -84,6 +86,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
