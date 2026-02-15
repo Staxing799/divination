@@ -7,11 +7,12 @@ import { parseRecordId } from '../../../../../lib/server/validators';
 
 export const runtime = 'nodejs';
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, context) {
   const language = resolveRequestLanguage(request);
 
   try {
     const user = await requireAuthUser(request);
+    const params = await context?.params;
     const id = parseRecordId(params?.id);
 
     const result = await prisma.divinationRecord.deleteMany({

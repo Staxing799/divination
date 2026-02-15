@@ -514,8 +514,7 @@ export default function OracleConsole() {
         setResult(null);
         setActiveHistoryId(null);
       }
-      const records = await getDivinationHistory(token, language);
-      applyHistory(records);
+      setHistory((items) => items.filter((item) => item.id !== recordId));
       flash(t('historyDeleted'));
     } catch (err) {
       setError(err.message || t('errorRequestFallback'));
