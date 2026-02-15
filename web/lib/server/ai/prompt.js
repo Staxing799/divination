@@ -18,10 +18,8 @@ Non-negotiable rules:
 ${headings}
 8) Action guidance must be specific, time-bounded, and realistic.
 9) Interpret only the exact drawn cards and positions provided by the user context. Never invent extra cards.
-10) In the final "Legal Notice" section, clearly state:
-   - This reading is for entertainment and self-reflection only.
-   - User should consult licensed professionals for medical, legal, and financial decisions.
-   - Service is intended for users age 18+.`;
+10) If the question touches high-stakes topics (medical, legal, financial, or safety), add one concise caution line inside the "Risks and Watch-outs" section only.
+11) Do not add any standalone legal disclaimer section when there is no high-stakes risk.`;
 }
 
 export function buildUserPrompt({ question, locale, spread }) {
@@ -75,28 +73,24 @@ function sectionHeadings(locale) {
 - Lectura Profunda
 - Ritual de Accion (Proximas 72 Horas)
 - Riesgos y Cuidado
-- Cierre Inspirador
-- Aviso Legal`;
+- Cierre Inspirador`;
     case 'ja':
       return `- 現在の気配
 - 深層リーディング
 - 行動リチュアル（今後72時間）
 - 注意ポイント
-- 締めの一言
-- 法的注意`;
+- 締めの一言`;
     case 'zh':
       return `- 当下气象
 - 深度解读
 - 行动仪式（未来72小时）
 - 风险提醒
-- 收束金句
-- 法律提示`;
+- 收束金句`;
     default:
       return `- Cosmic Snapshot
 - Deep Reading
 - Action Ritual (Next 72 Hours)
 - Risks and Watch-outs
-- Closing Line
-- Legal Notice`;
+- Closing Line`;
   }
 }

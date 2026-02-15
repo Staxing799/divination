@@ -6,11 +6,8 @@ import { useLanguage } from './language-provider';
 
 export default function TarotReadingOnlineContent() {
   const { language, hydrated } = useLanguage();
-  const t = (key) => translate(language, key);
-
-  if (!hydrated) {
-    return null;
-  }
+  const activeLanguage = hydrated ? language : 'en';
+  const t = (key) => translate(activeLanguage, key);
 
   return (
     <main className="seo-page">

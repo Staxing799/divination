@@ -1,3 +1,5 @@
+import { appendRiskReminderIfNeeded } from './risk';
+
 const CARD_HINTS = {
   'The Fool': 'a leap, trust, fresh cycle',
   'The Magician': 'focus, agency, skill alignment',
@@ -71,27 +73,17 @@ function tarotReading(question, locale, spread) {
       '实践建议：在24小时内先完成一个行动，其余答案会随势而来。'
     )
   );
-  lines.push('');
-  lines.push(legalNotice(locale));
-
-  return lines.join('\n');
+  return appendRiskReminderIfNeeded({
+    text: lines.join('\n'),
+    locale,
+    question
+  });
 }
 
 function positionLabel(position, locale) {
   if (position === 'PAST') return tr(locale, 'Past', 'Pasado', '過去', '过去');
   if (position === 'PRESENT') return tr(locale, 'Present', 'Presente', '現在', '现在');
   return tr(locale, 'Future', 'Futuro', '未来', '未来');
-}
-
-
-function legalNotice(locale) {
-  return tr(
-    locale,
-    'Legal notice: For entertainment and self-reflection only (18+). Not a substitute for professional medical, legal, or financial advice.',
-    'Aviso legal: solo para entretenimiento y reflexion personal (18+). No reemplaza asesoramiento medico, legal o financiero profesional.',
-    '法的注意: 本サービスは娯楽および自己内省目的（18+）です。医療・法律・金融の専門的助言の代替ではありません。',
-    '法律提示：本服务仅供娱乐与自我反思（18+），不构成医疗、法律或财务等专业建议。'
-  );
 }
 
 function tr(locale, en, es, ja, zh) {

@@ -1,5 +1,6 @@
 import { appConfig } from '../config';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
+import { appendRiskReminderIfNeeded } from './risk';
 
 export async function generateWithOpenAiCompatible(prompt) {
   const ai = appConfig.ai;
@@ -43,7 +44,11 @@ export async function generateWithOpenAiCompatible(prompt) {
       throw new Error('AI provider returned empty content');
     }
 
-    return content.trim();
+    return appendRiskReminderIfNeeded({
+      text: content.trim(),
+      locale: prompt.locale,
+      question: prompt.question
+    });
   } finally {
     clearTimeout(timeout);
   }
