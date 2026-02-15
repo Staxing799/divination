@@ -1,4 +1,5 @@
 import { ApiError } from './errors';
+import { validateProvidedSpread } from './ai/tarot';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -101,11 +102,17 @@ export function validateDivinationPayload(payload) {
     throw new ApiError(400, 'validation.question.length');
   }
 
+  const spread = validateProvidedSpread(payload?.spread);
+  if (payload?.spread && !spread) {
+    throw new ApiError(400, 'validation.required');
+  }
+
   return {
     type,
     question,
     birthDate: null,
-    locale: normalizeLocale(payload?.locale)
+    locale: normalizeLocale(payload?.locale),
+    spread
   };
 }
 

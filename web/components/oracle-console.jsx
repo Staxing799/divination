@@ -13,10 +13,17 @@ import {
 } from '../lib/api';
 import { unpackTarotResult } from '../lib/tarot-payload';
 import { COPY, SUPPORTED_LANGUAGES, translate } from '../lib/locale';
+import { createRitualPool, createSpreadFromPool, makeGuestReading } from '../lib/tarot-ritual';
 import { useLanguage } from './language-provider';
 import HomeSeoContent from './home-seo-content';
 
 const READING_TYPES = [{ id: 'TAROT', key: 'tarot' }];
+const RITUAL_STATUSES = {
+  IDLE: 'IDLE',
+  SELECTING: 'SELECTING',
+  REVEALING: 'REVEALING',
+  DONE: 'DONE'
+};
 
 const LANGUAGE_LABELS = {
   en: 'EN',
@@ -66,6 +73,33 @@ function normalizeReadingRecord(record) {
   };
 }
 
+function ritualStepLabel(language) {
+  if (language === 'zh') {
+    return ['1 提问', '2 选三张', '3 翻牌', '4 解读', '5 72小时行动'];
+  }
+  return ['1 Ask', '2 Pick 3', '3 Reveal', '4 Read', '5 72h Action'];
+}
+
+function ritualStatusText(language, status, picks) {
+  if (language === 'zh') {
+    if (status === RITUAL_STATUSES.SELECTING) {
+      return `从 6 张牌中选择 3 张（已选 ${picks}/3）`;
+    }
+    if (status === RITUAL_STATUSES.REVEALING) {
+      return '正在揭示牌阵并生成解读...';
+    }
+    return '输入问题并开始本轮三张牌仪式。';
+  }
+
+  if (status === RITUAL_STATUSES.SELECTING) {
+    return `Pick 3 cards from 6 (${picks}/3 selected).`;
+  }
+  if (status === RITUAL_STATUSES.REVEALING) {
+    return 'Revealing your spread and generating reading...';
+  }
+  return 'Enter one clear question and start your 3-card ritual.';
+}
+
 export default function OracleConsole() {
   const { language, setLanguage, hydrated } = useLanguage();
 
@@ -73,9 +107,11 @@ export default function OracleConsole() {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
   const [result, setResult] = useState(null);
+  const [guestResult, setGuestResult] = useState(null);
   const [activeHistoryId, setActiveHistoryId] = useState(null);
 
   const [authMode, setAuthMode] = useState('login');
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authForm, setAuthForm] = useState(INITIAL_AUTH_FORM);
   const [readingForm, setReadingForm] = useState(INITIAL_READING_FORM);
 
@@ -87,11 +123,17 @@ export default function OracleConsole() {
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [ritualTick, setRitualTick] = useState(0);
 
+  const [ritualStatus, setRitualStatus] = useState(RITUAL_STATUSES.IDLE);
+  const [ritualPool, setRitualPool] = useState([]);
+  const [selectedPoolIndexes, setSelectedPoolIndexes] = useState([]);
+  const [ritualSpread, setRitualSpread] = useState(null);
+  const [revealedCount, setRevealedCount] = useState(0);
+
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const authPanelRef = useRef(null);
   const messageTimerRef = useRef(null);
+  const revealTimerRef = useRef(null);
 
   const copy = useMemo(() => COPY[language] || COPY.en, [language]);
   const t = (key, vars) => translate(language, key, vars);
@@ -111,6 +153,13 @@ export default function OracleConsole() {
     }, 2800);
   }
 
+  function clearRevealTimer() {
+    if (revealTimerRef.current) {
+      clearInterval(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -127,8 +176,22 @@ export default function OracleConsole() {
       if (messageTimerRef.current) {
         clearTimeout(messageTimerRef.current);
       }
+      clearRevealTimer();
     };
   }, []);
+
+  useEffect(() => {
+    if (!authModalOpen) {
+      return undefined;
+    }
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        setAuthModalOpen(false);
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [authModalOpen]);
 
   useEffect(() => {
     if (!authenticated) {
@@ -152,22 +215,7 @@ export default function OracleConsole() {
         if (canceled) {
           return;
         }
-        if (profile?.legalReady) {
-          setUser(profile);
-        } else {
-          const consented = await acceptLegalConsent(
-            {
-              age18Confirmed: true,
-              entertainmentOnlyAccepted: true,
-              advisoryNoticeAccepted: true
-            },
-            token,
-            language
-          );
-          if (!canceled) {
-            setUser(consented);
-          }
-        }
+        setUser(profile);
         applyHistory(records);
       } catch (err) {
         if (canceled) {
@@ -230,6 +278,7 @@ export default function OracleConsole() {
     setUser(null);
     setHistory([]);
     setResult(null);
+    setGuestResult(null);
     setActiveHistoryId(null);
     setAuthForm(INITIAL_AUTH_FORM);
     setReadingForm(INITIAL_READING_FORM);
@@ -238,8 +287,26 @@ export default function OracleConsole() {
     setMessage('');
   }
 
-  function scrollToAuth() {
-    authPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function openAuthModal(nextMode = 'login') {
+    setAuthMode(nextMode);
+    setAuthModalOpen(true);
+  }
+
+  function closeAuthModal() {
+    if (authBusy) {
+      return;
+    }
+    setAuthModalOpen(false);
+  }
+
+  function resetRitualBoard() {
+    clearRevealTimer();
+    setRitualPool([]);
+    setSelectedPoolIndexes([]);
+    setRitualSpread(null);
+    setRevealedCount(0);
+    setRitualStatus(RITUAL_STATUSES.IDLE);
+    setRitualTick((value) => value + 1);
   }
 
   async function refreshHistory() {
@@ -268,9 +335,9 @@ export default function OracleConsole() {
             password: authForm.password,
             displayName: authForm.displayName,
             locale: language,
-            age18Confirmed: authForm.entertainmentOnlyAccepted,
+            age18Confirmed: authForm.age18Confirmed,
             entertainmentOnlyAccepted: authForm.entertainmentOnlyAccepted,
-            advisoryNoticeAccepted: authForm.entertainmentOnlyAccepted
+            advisoryNoticeAccepted: authForm.advisoryNoticeAccepted
           }
         : {
             email: authForm.email,
@@ -284,6 +351,7 @@ export default function OracleConsole() {
       persistToken(response.token);
       setUser(response.user);
       setAuthForm(INITIAL_AUTH_FORM);
+      setAuthModalOpen(false);
       flash(t('authSuccess'));
     } catch (err) {
       setError(err.message || t('errorRequestFallback'));
@@ -292,49 +360,143 @@ export default function OracleConsole() {
     }
   }
 
-  async function onReadingSubmit(event) {
-    event.preventDefault();
-    if (!token) {
-      return;
-    }
-
+  function startSelectionStage() {
     const question = readingForm.question.trim();
     if (question.length < 3) {
       setError(t('questionTooShort'));
       return;
     }
 
-    setReadingBusy(true);
     setError('');
     setMessage('');
-    setRitualTick((value) => value + 1);
     setResult(null);
+    setGuestResult(null);
+    setActiveHistoryId(null);
+    setRitualPool(createRitualPool(6));
+    setSelectedPoolIndexes([]);
+    setRitualSpread(null);
+    setRevealedCount(0);
+    setRitualStatus(RITUAL_STATUSES.SELECTING);
+    setRitualTick((value) => value + 1);
+  }
+
+  function togglePoolCard(index) {
+    if (ritualStatus !== RITUAL_STATUSES.SELECTING) {
+      return;
+    }
+
+    setSelectedPoolIndexes((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((value) => value !== index);
+      }
+      if (prev.length >= 3) {
+        return prev;
+      }
+      return [...prev, index];
+    });
+  }
+
+  async function runReadingWithSpread(spread) {
+    setReadingBusy(true);
 
     try {
-      const data = await createDivination(
-        {
-          type: readingForm.type,
+      const question = readingForm.question.trim();
+      if (authenticated) {
+        if (!user?.legalReady) {
+          setError(t('legalGateNeededError'));
+          return;
+        }
+
+        const data = await createDivination(
+          {
+            type: readingForm.type,
+            question,
+            locale: language,
+            spread
+          },
+          token,
+          language
+        );
+
+        setResult(normalizeReadingRecord(data));
+        setActiveHistoryId(data.id);
+        setReadingForm((prev) => ({
+          ...prev,
+          question: ''
+        }));
+
+        const records = await getDivinationHistory(token, language);
+        applyHistory(records);
+        flash(t('readGenerated'));
+      } else {
+        const guestText = makeGuestReading({ question, spread, locale: language });
+        setGuestResult({
+          id: `guest-${Date.now()}`,
+          type: 'TAROT',
           question,
-          locale: language
-        },
-        token,
-        language
-      );
-
-      setResult(normalizeReadingRecord(data));
-      setActiveHistoryId(data.id);
-      setReadingForm((prev) => ({
-        ...prev,
-        question: ''
-      }));
-
-      const records = await getDivinationHistory(token, language);
-      applyHistory(records);
-      flash(t('readGenerated'));
+          resultText: guestText,
+          createdAt: new Date().toISOString(),
+          tarotMeta: spread.cards
+        });
+      }
     } catch (err) {
       setError(err.message || t('errorRequestFallback'));
     } finally {
       setReadingBusy(false);
+      setRitualStatus(RITUAL_STATUSES.DONE);
+    }
+  }
+
+  async function onRitualSubmit(event) {
+    event.preventDefault();
+
+    if (ritualStatus !== RITUAL_STATUSES.SELECTING) {
+      startSelectionStage();
+      return;
+    }
+
+    if (selectedPoolIndexes.length !== 3) {
+      return;
+    }
+
+    const spread = createSpreadFromPool(ritualPool, selectedPoolIndexes);
+    setRitualSpread(spread);
+    setRitualStatus(RITUAL_STATUSES.REVEALING);
+    setRevealedCount(0);
+
+    clearRevealTimer();
+    revealTimerRef.current = setInterval(() => {
+      setRevealedCount((value) => {
+        if (value >= 3) {
+          clearRevealTimer();
+          return 3;
+        }
+        return value + 1;
+      });
+    }, 320);
+
+    await runReadingWithSpread(spread);
+  }
+
+  async function onConfirmLegal() {
+    if (!token || !user || user.legalReady) {
+      return;
+    }
+
+    try {
+      const profile = await acceptLegalConsent(
+        {
+          age18Confirmed: true,
+          entertainmentOnlyAccepted: true,
+          advisoryNoticeAccepted: true
+        },
+        token,
+        language
+      );
+      setUser(profile);
+      flash(t('legalGateSaved'));
+    } catch (err) {
+      setError(err.message || t('errorRequestFallback'));
     }
   }
 
@@ -392,12 +554,21 @@ export default function OracleConsole() {
 
   function viewHistory(item) {
     setResult(normalizeReadingRecord(item));
+    setGuestResult(null);
     setActiveHistoryId(item.id);
+    setRitualStatus(RITUAL_STATUSES.DONE);
+    setRitualSpread({ spread: 'THREE_CARD', cards: item.tarotMeta || [] });
+    setRevealedCount(3);
+    setRitualTick((value) => value + 1);
   }
 
-  const ritualCards = readingBusy && !result
-    ? [{}, {}, {}]
-    : (result?.tarotMeta || []);
+  const displayResult = authenticated ? result : guestResult;
+  const displayCards = displayResult?.tarotMeta || [];
+  const showSelectionGrid = ritualStatus === RITUAL_STATUSES.SELECTING;
+  const showRevealGrid = ritualSpread?.cards?.length > 0 && (ritualStatus === RITUAL_STATUSES.REVEALING || ritualStatus === RITUAL_STATUSES.DONE);
+  const ritualButtonText = ritualStatus === RITUAL_STATUSES.SELECTING
+    ? (language === 'zh' ? '确认三张牌并揭示' : 'Confirm 3 cards and reveal')
+    : (language === 'zh' ? '开始三张牌仪式' : 'Start 3-card ritual');
 
   return (
     <div className="site-shell">
@@ -434,6 +605,11 @@ export default function OracleConsole() {
               {copy.logout}
             </button>
           )}
+          {!authenticated && (
+            <button type="button" className="ghost-btn" onClick={() => openAuthModal('login')}>
+              {copy.signIn}
+            </button>
+          )}
         </div>
       </header>
 
@@ -444,6 +620,7 @@ export default function OracleConsole() {
             <div className="ritual-aura ritual-aura-right" aria-hidden="true" />
           </>
         )}
+
         {!authenticated && (
           <section className="hero-card card">
             <p className="hero-kicker">{copy.brandName}</p>
@@ -455,7 +632,7 @@ export default function OracleConsole() {
             <h2>{copy.heroTitle}</h2>
             <p>{copy.heroSubtitle}</p>
             <div className="hero-cta-row">
-              <button type="button" className="primary-btn" onClick={scrollToAuth}>
+              <button type="button" className="primary-btn" onClick={() => openAuthModal('register')}>
                 {copy.heroCta}
               </button>
               <p className="hero-trust">{copy.heroTrust}</p>
@@ -463,14 +640,216 @@ export default function OracleConsole() {
           </section>
         )}
 
-        {!authenticated && (
-          <section ref={authPanelRef} className="card auth-card">
+        <section className="card reading-card">
+          <div className="section-head">
+            <h3>{authenticated ? copy.dashboardTitle : (language === 'zh' ? '塔罗游戏规则' : 'Tarot Ritual Rules')}</h3>
+            {authenticated && (
+              <button type="button" className="ghost-btn" onClick={refreshHistory}>
+                {copy.refresh}
+              </button>
+            )}
+          </div>
+
+          <p className="muted">{authenticated ? copy.dashboardSubtitle : ritualStatusText(language, ritualStatus, selectedPoolIndexes.length)}</p>
+
+          <div className="ritual-steps">
+            {ritualStepLabel(language).map((step) => (
+              <span key={step}>{step}</span>
+            ))}
+          </div>
+
+          {authenticated && user && !user.legalReady && (
+            <div className="legal-box legal-inline-box">
+              <p>{copy.legalGateDesc}</p>
+              <button type="button" className="ghost-btn" onClick={onConfirmLegal}>
+                {copy.legalGateAction}
+              </button>
+            </div>
+          )}
+
+          <form className="form-grid" onSubmit={onRitualSubmit}>
+            <div className="field-label">{copy.tarot}</div>
+
+            <label>
+              <span>{copy.questionLabel}</span>
+              <textarea
+                required
+                minLength={3}
+                maxLength={500}
+                value={readingForm.question}
+                onChange={(event) =>
+                  setReadingForm((prev) => ({ ...prev, question: event.target.value }))
+                }
+              />
+            </label>
+
+            <div className="ritual-action-row">
+              <button
+                type="submit"
+                className="primary-btn"
+                disabled={readingBusy || ritualStatus === RITUAL_STATUSES.REVEALING || (ritualStatus === RITUAL_STATUSES.SELECTING && selectedPoolIndexes.length !== 3)}
+              >
+                {readingBusy ? copy.loading : ritualButtonText}
+              </button>
+              {(ritualStatus !== RITUAL_STATUSES.IDLE || displayResult) && (
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={resetRitualBoard}
+                  disabled={readingBusy}
+                >
+                  {language === 'zh' ? '重置本轮' : 'Reset Ritual'}
+                </button>
+              )}
+            </div>
+          </form>
+
+          {showSelectionGrid && (
+            <div className="ritual-pool" role="list" aria-label={language === 'zh' ? '抽牌区' : 'Card selection area'}>
+              {ritualPool.map((card, index) => {
+                const selected = selectedPoolIndexes.includes(index);
+                return (
+                  <button
+                    key={`${card.id}-${index}`}
+                    type="button"
+                    className={selected ? 'ritual-pool-card selected' : 'ritual-pool-card'}
+                    onClick={() => togglePoolCard(index)}
+                  >
+                    <span>{selected ? `${selectedPoolIndexes.indexOf(index) + 1}` : '✦'}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {showRevealGrid && (
+            <div className="tarot-stage" key={`reveal-${ritualTick}`}>
+              {ritualSpread.cards.map((card, index) => {
+                const visible = ritualStatus === RITUAL_STATUSES.DONE || revealedCount > index;
+                return (
+                  <article
+                    key={`${card.cardId}-${card.position}-${index}`}
+                    className={`tarot-card ${card.orientation === 'REVERSED' ? 'reversed' : ''} ${visible ? 'is-visible' : 'is-loading'}`}
+                    style={{ '--delay': `${index * 160}ms` }}
+                  >
+                    {visible ? (
+                      <>
+                        <p className="tarot-pos">{t(`tarotPos${card.position}`)}</p>
+                        <h4>{card.name}</h4>
+                        <span>{card.orientation === 'REVERSED' ? copy.tarotReversed : copy.tarotUpright}</span>
+                      </>
+                    ) : (
+                      <div className="tarot-back-star" />
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        <section className="card result-card">
+          <div className="section-head">
+            <h3>{copy.latestReading}</h3>
+          </div>
+
+          {displayResult ? (
+            <article className="result-content">
+              {displayCards.length > 0 && ritualStatus === RITUAL_STATUSES.IDLE && (
+                <div className="tarot-stage" key={`${displayResult.id}-${ritualTick}`}>
+                  {displayCards.map((card, index) => (
+                    <article
+                      key={`${card.cardId}-${card.position}-${index}`}
+                      className={`tarot-card ${card.orientation === 'REVERSED' ? 'reversed' : ''}`}
+                      style={{ '--delay': `${index * 140}ms` }}
+                    >
+                      <p className="tarot-pos">{t(`tarotPos${card.position}`)}</p>
+                      <h4>{card.name}</h4>
+                      <span>{card.orientation === 'REVERSED' ? copy.tarotReversed : copy.tarotUpright}</span>
+                    </article>
+                  ))}
+                </div>
+              )}
+              <p className="result-meta">{typeLabel(displayResult.type)} · {formatDate(displayResult.createdAt, language)}</p>
+              <pre>{displayResult.resultText}</pre>
+              {!authenticated && (
+                <div className="guest-upgrade">
+                  <p>{language === 'zh' ? '游客模式不会保存历史，注册后可保存每次牌阵与解读。' : 'Guest mode does not save history. Create an account to keep your spread timeline.'}</p>
+                  <button type="button" className="primary-btn" onClick={() => openAuthModal('register')}>
+                    {copy.signUp}
+                  </button>
+                </div>
+              )}
+            </article>
+          ) : (
+            <p className="muted">{readingBusy ? copy.tarotShuffling : copy.emptyReading}</p>
+          )}
+        </section>
+
+        {authenticated && (
+          <section className="card history-card">
+            <div className="section-head">
+              <h3>{copy.historyTitle}</h3>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={requestClearHistory}
+                disabled={historyBusy || history.length === 0}
+              >
+                {historyBusy ? copy.loading : copy.clearHistory}
+              </button>
+            </div>
+
+            {history.length === 0 && <p className="muted">{copy.noHistory}</p>}
+
+            {history.length > 0 && (
+              <ul className="history-list">
+                {history.map((item) => (
+                  <li key={item.id} className={activeHistoryId === item.id ? 'active' : ''}>
+                    <div className="history-top">
+                      <div>
+                        <strong>{typeLabel(item.type)}</strong>
+                        <span>{formatDate(item.createdAt, language)}</span>
+                      </div>
+                      <div className="history-actions">
+                        <button
+                          type="button"
+                          className={activeHistoryId === item.id ? 'ghost-btn tiny active' : 'ghost-btn tiny'}
+                          onClick={() => viewHistory(item)}
+                        >
+                          {copy.viewHistory}
+                        </button>
+                        <button
+                          type="button"
+                          className="danger-btn tiny"
+                          onClick={() => onDeleteHistory(item.id)}
+                          disabled={Boolean(removingId) || historyBusy}
+                        >
+                          {removingId === item.id ? copy.loading : copy.deleteHistory}
+                        </button>
+                      </div>
+                    </div>
+                    <p>{item.question}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+      </main>
+
+      {!authenticated && <HomeSeoContent />}
+
+      {authModalOpen && !authenticated && (
+        <div className="auth-modal-backdrop" role="presentation" onClick={closeAuthModal}>
+          <section className="auth-modal-shell" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
             <div className="auth-ornament" aria-hidden="true">
               <span className="auth-ornament-line" />
               <p>{copy.authOrnament}</p>
               <span className="auth-ornament-line" />
             </div>
-            <div className="auth-inner">
+            <button type="button" className="auth-modal-close" onClick={closeAuthModal} aria-label="Close">×</button>
+            <div className="auth-inner auth-modal-body">
               <div className="section-head">
                 <h3>{copy.authPanelTitle}</h3>
               </div>
@@ -534,6 +913,20 @@ export default function OracleConsole() {
                       <input
                         type="checkbox"
                         required
+                        checked={authForm.age18Confirmed}
+                        onChange={(event) =>
+                          setAuthForm((prev) => ({
+                            ...prev,
+                            age18Confirmed: event.target.checked
+                          }))
+                        }
+                      />
+                      <span>{copy.confirmAge18}</span>
+                    </label>
+                    <label className="checkbox-row">
+                      <input
+                        type="checkbox"
+                        required
                         checked={authForm.entertainmentOnlyAccepted}
                         onChange={(event) =>
                           setAuthForm((prev) => ({
@@ -544,6 +937,20 @@ export default function OracleConsole() {
                       />
                       <span>{copy.confirmEntertainment}</span>
                     </label>
+                    <label className="checkbox-row">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={authForm.advisoryNoticeAccepted}
+                        onChange={(event) =>
+                          setAuthForm((prev) => ({
+                            ...prev,
+                            advisoryNoticeAccepted: event.target.checked
+                          }))
+                        }
+                      />
+                      <span>{copy.confirmAdviceLimits}</span>
+                    </label>
                   </div>
                 )}
 
@@ -553,135 +960,8 @@ export default function OracleConsole() {
               </form>
             </div>
           </section>
+        </div>
         )}
-
-        {authenticated && (
-          <>
-            <section className="card reading-card">
-              <div className="section-head">
-                <h3>{copy.dashboardTitle}</h3>
-                <button type="button" className="ghost-btn" onClick={refreshHistory}>
-                  {copy.refresh}
-                </button>
-              </div>
-              <p className="muted">{copy.dashboardSubtitle}</p>
-
-              <form className="form-grid" onSubmit={onReadingSubmit}>
-                <div className="field-label">{copy.tarot}</div>
-
-                <label>
-                  <span>{copy.questionLabel}</span>
-                  <textarea
-                    required
-                    minLength={3}
-                    maxLength={500}
-                    value={readingForm.question}
-                    onChange={(event) =>
-                      setReadingForm((prev) => ({ ...prev, question: event.target.value }))
-                    }
-                  />
-                </label>
-
-                <button type="submit" className="primary-btn" disabled={readingBusy}>
-                  {readingBusy ? copy.loading : copy.generateReading}
-                </button>
-              </form>
-            </section>
-
-            <section className="card result-card">
-              <div className="section-head">
-                <h3>{copy.latestReading}</h3>
-              </div>
-
-              {result ? (
-                <article className="result-content">
-                  {result?.tarotMeta?.length > 0 && (
-                    <div className="tarot-stage" key={`${result.id}-${ritualTick}`}>
-                      {result.tarotMeta.map((card, index) => (
-                        <article
-                          key={`${card.cardId}-${card.position}-${index}`}
-                          className={`tarot-card ${card.orientation === 'REVERSED' ? 'reversed' : ''}`}
-                          style={{ '--delay': `${index * 140}ms` }}
-                        >
-                          <p className="tarot-pos">{t(`tarotPos${card.position}`)}</p>
-                          <h4>{card.name}</h4>
-                          <span>{card.orientation === 'REVERSED' ? copy.tarotReversed : copy.tarotUpright}</span>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                  <p className="result-meta">{typeLabel(result.type)} · {formatDate(result.createdAt, language)}</p>
-                  <pre>{result.resultText}</pre>
-                </article>
-              ) : (
-                <>
-                  {ritualCards.length > 0 && (
-                    <div className="tarot-stage" key={`ritual-${ritualTick}`}>
-                      {ritualCards.map((_, index) => (
-                        <article key={`ritual-card-${index}`} className="tarot-card is-loading" style={{ '--delay': `${index * 120}ms` }}>
-                          <div className="tarot-back-star" />
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                  <p className="muted">{readingBusy ? copy.tarotShuffling : copy.emptyReading}</p>
-                </>
-              )}
-
-            </section>
-
-            <section className="card history-card">
-              <div className="section-head">
-                <h3>{copy.historyTitle}</h3>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={requestClearHistory}
-                  disabled={historyBusy || history.length === 0}
-                >
-                  {historyBusy ? copy.loading : copy.clearHistory}
-                </button>
-              </div>
-
-              {history.length === 0 && <p className="muted">{copy.noHistory}</p>}
-
-              {history.length > 0 && (
-                <ul className="history-list">
-                  {history.map((item) => (
-                    <li key={item.id} className={activeHistoryId === item.id ? 'active' : ''}>
-                      <div className="history-top">
-                        <div>
-                          <strong>{typeLabel(item.type)}</strong>
-                          <span>{formatDate(item.createdAt, language)}</span>
-                        </div>
-                        <div className="history-actions">
-                          <button
-                            type="button"
-                            className={activeHistoryId === item.id ? 'ghost-btn tiny active' : 'ghost-btn tiny'}
-                            onClick={() => viewHistory(item)}
-                          >
-                            {copy.viewHistory}
-                          </button>
-                          <button
-                            type="button"
-                            className="danger-btn tiny"
-                            onClick={() => onDeleteHistory(item.id)}
-                            disabled={Boolean(removingId) || historyBusy}
-                          >
-                            {removingId === item.id ? copy.loading : copy.deleteHistory}
-                          </button>
-                        </div>
-                      </div>
-                      <p>{item.question}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </>
-        )}
-      </main>
-      {!authenticated && <HomeSeoContent />}
 
       {confirmingClear && (
         <div className="ritual-modal-backdrop" role="presentation" onClick={() => setConfirmingClear(false)}>

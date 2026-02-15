@@ -10,7 +10,7 @@ export async function generateDivinationText(input) {
     ...input,
     locale: normalizeLocale(input.locale)
   };
-  const spread = drawThreeCardSpread();
+  const spread = input.spread || drawThreeCardSpread();
 
   if (!appConfig.ai.enabled) {
     const text = generateFallbackReading({ ...prompt, spread });

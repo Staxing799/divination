@@ -1,4 +1,4 @@
-export const DEFAULT_SITE_URL = 'https://divination-eight.vercel.app';
+export const DEFAULT_SITE_URL = 'https://www.tarot-events.top';
 
 function normalizeSiteUrl(url) {
   if (!url) return '';

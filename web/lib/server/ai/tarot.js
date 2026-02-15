@@ -1,5 +1,7 @@
 import { randomInt } from 'node:crypto';
 
+export const POSITIONS = ['PAST', 'PRESENT', 'FUTURE'];
+
 const MAJOR_ARCANA = [
   'The Fool',
   'The Magician',
@@ -27,9 +29,8 @@ const MAJOR_ARCANA = [
 
 const MINOR_SUITS = ['Wands', 'Cups', 'Swords', 'Pentacles'];
 const MINOR_RANKS = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Page', 'Knight', 'Queen', 'King'];
-const POSITIONS = ['PAST', 'PRESENT', 'FUTURE'];
-
 const FULL_DECK = buildFullDeck();
+const CARD_BY_ID = new Map(FULL_DECK.map((card) => [card.id, card]));
 
 function buildFullDeck() {
   const majorCards = MAJOR_ARCANA.map((name, index) => ({
@@ -81,6 +82,54 @@ export function drawThreeCardSpread() {
         orientation: randomInt(2) === 0 ? 'UPRIGHT' : 'REVERSED'
       };
     })
+  };
+}
+
+export function validateProvidedSpread(input) {
+  if (!input) return null;
+  if (input.spread !== 'THREE_CARD' || !Array.isArray(input.cards) || input.cards.length !== 3) {
+    return null;
+  }
+
+  const usedIds = new Set();
+  const cards = [];
+
+  for (let index = 0; index < POSITIONS.length; index += 1) {
+    const current = input.cards[index];
+    if (!current || current.position !== POSITIONS[index]) {
+      return null;
+    }
+    if (current.orientation !== 'UPRIGHT' && current.orientation !== 'REVERSED') {
+      return null;
+    }
+    const base = CARD_BY_ID.get(current.cardId);
+    if (!base || usedIds.has(base.id)) {
+      return null;
+    }
+    if (base.name !== current.name || base.arcana !== current.arcana) {
+      return null;
+    }
+    if ((base.suit || null) !== (current.suit || null)) {
+      return null;
+    }
+    if ((base.rank || null) !== (current.rank || null)) {
+      return null;
+    }
+    usedIds.add(base.id);
+    cards.push({
+      position: current.position,
+      cardId: base.id,
+      name: base.name,
+      arcana: base.arcana,
+      suit: base.suit,
+      rank: base.rank,
+      orientation: current.orientation
+    });
+  }
+
+  return {
+    spread: 'THREE_CARD',
+    cards
   };
 }
 
