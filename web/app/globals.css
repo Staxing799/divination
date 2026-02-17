@@ -889,6 +889,45 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
+.result-interpretation {
+  margin-top: 0.74rem;
+  padding-top: 0.68rem;
+  border-top: 1px solid rgba(236, 198, 108, 0.2);
+}
+
+.result-interpretation-title {
+  margin: 0;
+  color: #f6deb0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.result-interpretation ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.result-interpretation li {
+  color: #decaef;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.result-interpretation li strong {
+  display: block;
+  margin-bottom: 0.08rem;
+  color: #f8ecd1;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.result-interpretation li span {
+  display: block;
+}
+
 .guest-upgrade {
   margin-top: 0.82rem;
   border-top: 1px solid rgba(236, 198, 108, 0.2);

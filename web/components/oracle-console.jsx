@@ -100,6 +100,151 @@ function ritualStatusText(language, status, picks) {
   return 'Enter one clear question and start your 3-card ritual.';
 }
 
+function copyByLanguage(language, values) {
+  if (values[language]) return values[language];
+  return values.en;
+}
+
+function quickInterpretationTitle(language) {
+  return copyByLanguage(language, {
+    en: 'Spread Interpretation',
+    zh: '牌阵补充解读',
+    es: 'Interpretacion de la tirada',
+    ja: 'スプレッド補足解釈'
+  });
+}
+
+function positionInterpretation(position, language) {
+  if (position === 'PAST') {
+    return copyByLanguage(language, {
+      en: 'This card shows the old pattern still shaping the situation.',
+      zh: '这张牌在说明仍在影响当下的旧模式。',
+      es: 'Esta carta muestra el patron anterior que aun influye en la situacion.',
+      ja: 'このカードは、今も影響している過去のパターンを示します。'
+    });
+  }
+
+  if (position === 'PRESENT') {
+    return copyByLanguage(language, {
+      en: 'This card points to your current core tension and choice.',
+      zh: '这张牌对应你现在最核心的张力与选择。',
+      es: 'Esta carta senala la tension central y la eleccion actual.',
+      ja: 'このカードは、現在の中心的な緊張点と選択を示します。'
+    });
+  }
+
+  return copyByLanguage(language, {
+    en: 'This card points to the likely direction if your current rhythm continues.',
+    zh: '这张牌指向你保持当前节奏时最可能出现的走向。',
+    es: 'Esta carta indica la direccion probable si mantienes el ritmo actual.',
+    ja: 'このカードは、今の流れを続けた場合の向かう先を示します。'
+  });
+}
+
+function arcanaInterpretation(card, language) {
+  if (card.arcana === 'MAJOR') {
+    return copyByLanguage(language, {
+      en: 'Major Arcana theme: long-cycle turning point and high-impact lesson.',
+      zh: '大阿卡纳主题：这是长周期转折与高影响课题。',
+      es: 'Tema de Arcanos Mayores: punto de giro de ciclo largo y leccion de alto impacto.',
+      ja: '大アルカナの主題: 長期サイクルの転換点と重要な学びです。'
+    });
+  }
+
+  if (card.suit === 'Wands') {
+    return copyByLanguage(language, {
+      en: 'Wands focus: initiative, drive, and execution speed.',
+      zh: '权杖主题：主动性、推进力与执行速度。',
+      es: 'Enfoque de Bastos: iniciativa, impulso y velocidad de ejecucion.',
+      ja: 'ワンドの焦点: 主体性、推進力、実行スピード。'
+    });
+  }
+
+  if (card.suit === 'Cups') {
+    return copyByLanguage(language, {
+      en: 'Cups focus: emotions, trust, and relationship signals.',
+      zh: '圣杯主题：情绪流动、信任与关系信号。',
+      es: 'Enfoque de Copas: emociones, confianza y senales relacionales.',
+      ja: 'カップの焦点: 感情、信頼、関係のサイン。'
+    });
+  }
+
+  if (card.suit === 'Swords') {
+    return copyByLanguage(language, {
+      en: 'Swords focus: clarity, conflict, and decision quality.',
+      zh: '宝剑主题：认知清晰度、冲突与决策质量。',
+      es: 'Enfoque de Espadas: claridad, conflicto y calidad de decision.',
+      ja: 'ソードの焦点: 明晰さ、対立、意思決定の質。'
+    });
+  }
+
+  if (card.suit === 'Pentacles') {
+    return copyByLanguage(language, {
+      en: 'Pentacles focus: resources, money rhythm, and tangible stability.',
+      zh: '星币主题：资源配置、金钱节奏与现实稳定性。',
+      es: 'Enfoque de Oros: recursos, ritmo financiero y estabilidad tangible.',
+      ja: 'ペンタクルの焦点: 資源配分、金銭リズム、現実的な安定。'
+    });
+  }
+
+  return copyByLanguage(language, {
+    en: 'Minor Arcana theme: practical adjustment in daily decisions.',
+    zh: '小阿卡纳主题：日常层面的务实调整。',
+    es: 'Tema de Arcanos Menores: ajuste practico en decisiones cotidianas.',
+    ja: '小アルカナの主題: 日常判断での実務的な調整。'
+  });
+}
+
+function orientationInterpretation(orientation, language) {
+  if (orientation === 'REVERSED') {
+    return copyByLanguage(language, {
+      en: 'Reversed cue: reduce overcorrection and clear internal friction first.',
+      zh: '逆位提示：先降低用力过度，优先清理内在阻滞。',
+      es: 'Clave invertida: reduce la sobrecorreccion y limpia primero la friccion interna.',
+      ja: '逆位置の示唆: 修正しすぎを抑え、まず内側の摩擦を整える。'
+    });
+  }
+
+  return copyByLanguage(language, {
+    en: 'Upright cue: the energy is available now, so act in a simple and direct way.',
+    zh: '正位提示：这股能量可直接使用，行动宜简洁直接。',
+    es: 'Clave derecha: la energia esta disponible, actua de forma simple y directa.',
+    ja: '正位置の示唆: 今はエネルギーを使えるため、シンプルに前進する。'
+  });
+}
+
+function positionLabelFromCopy(position, copy) {
+  if (position === 'PAST') return copy.tarotPosPAST;
+  if (position === 'PRESENT') return copy.tarotPosPRESENT;
+  return copy.tarotPosFUTURE;
+}
+
+function buildQuickInterpretation(cards, language, copy) {
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return [];
+  }
+
+  return cards.map((card, index) => {
+    const positionLabel = positionLabelFromCopy(card.position, copy);
+    const orientationLabel = card.orientation === 'REVERSED' ? copy.tarotReversed : copy.tarotUpright;
+    const title = language === 'zh' || language === 'ja'
+      ? `${positionLabel}｜${card.name}（${orientationLabel}）`
+      : `${positionLabel} | ${card.name} (${orientationLabel})`;
+
+    const body = [
+      positionInterpretation(card.position, language),
+      arcanaInterpretation(card, language),
+      orientationInterpretation(card.orientation, language)
+    ].join(' ');
+
+    return {
+      key: `${card.cardId || card.name}-${card.position}-${index}`,
+      title,
+      body
+    };
+  });
+}
+
 export default function OracleConsole() {
   const { language, setLanguage, hydrated } = useLanguage();
 
@@ -307,19 +452,6 @@ export default function OracleConsole() {
     setRevealedCount(0);
     setRitualStatus(RITUAL_STATUSES.IDLE);
     setRitualTick((value) => value + 1);
-  }
-
-  async function refreshHistory() {
-    if (!token) {
-      return;
-    }
-    try {
-      const records = await getDivinationHistory(token, language);
-      applyHistory(records);
-      flash(t('refresh'));
-    } catch (err) {
-      setError(err.message || t('errorRequestFallback'));
-    }
   }
 
   async function onAuthSubmit(event) {
@@ -563,6 +695,10 @@ export default function OracleConsole() {
 
   const displayResult = authenticated ? result : guestResult;
   const displayCards = displayResult?.tarotMeta || [];
+  const quickInterpretationItems = useMemo(
+    () => buildQuickInterpretation(displayCards, language, copy),
+    [displayCards, language, copy]
+  );
   const showSelectionGrid = ritualStatus === RITUAL_STATUSES.SELECTING;
   const showRevealGrid = ritualSpread?.cards?.length > 0 && (ritualStatus === RITUAL_STATUSES.REVEALING || ritualStatus === RITUAL_STATUSES.DONE);
   const ritualButtonText = ritualStatus === RITUAL_STATUSES.SELECTING
@@ -642,11 +778,6 @@ export default function OracleConsole() {
         <section className="card reading-card">
           <div className="section-head">
             <h3>{authenticated ? copy.dashboardTitle : (language === 'zh' ? '塔罗游戏规则' : 'Tarot Ritual Rules')}</h3>
-            {authenticated && (
-              <button type="button" className="ghost-btn" onClick={refreshHistory}>
-                {copy.refresh}
-              </button>
-            )}
           </div>
 
           <p className="muted">{authenticated ? copy.dashboardSubtitle : ritualStatusText(language, ritualStatus, selectedPoolIndexes.length)}</p>
@@ -771,6 +902,19 @@ export default function OracleConsole() {
               )}
               <p className="result-meta">{typeLabel(displayResult.type)} · {formatDate(displayResult.createdAt, language)}</p>
               <pre>{displayResult.resultText}</pre>
+              {quickInterpretationItems.length > 0 && (
+                <section className="result-interpretation">
+                  <p className="result-interpretation-title">{quickInterpretationTitle(language)}</p>
+                  <ul>
+                    {quickInterpretationItems.map((item) => (
+                      <li key={item.key}>
+                        <strong>{item.title}</strong>
+                        <span>{item.body}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
               {!authenticated && (
                 <div className="guest-upgrade">
                   <p>{language === 'zh' ? '游客模式不会保存历史，注册后可保存每次牌阵与解读。' : 'Guest mode does not save history. Create an account to keep your spread timeline.'}</p>
