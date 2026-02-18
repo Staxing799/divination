@@ -24,11 +24,11 @@ export const metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon.png', type: 'image/png', sizes: '64x64' }
+      { url: '/icon.png', type: 'image/png', sizes: '96x96' },
+      { url: '/favicon.ico', sizes: 'any' }
     ],
     shortcut: ['/favicon.ico'],
-    apple: [{ url: '/icon.png', sizes: '64x64' }]
+    apple: [{ url: '/icon.png', sizes: '96x96' }]
   },
   title: {
     default: 'AI Tarot Reading Free | 免费AI塔罗牌占卜',
