@@ -18,6 +18,7 @@ const bodyFont = Manrope({
 
 const siteUrl = resolveSiteUrl();
 const GA_MEASUREMENT_ID = 'G-VPXXRX0KSE';
+const ADSENSE_CLIENT = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-3566921583810316').trim();
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -86,6 +87,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <Script
+          id="google-adsense"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
