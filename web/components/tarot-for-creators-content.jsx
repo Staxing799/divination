@@ -14,9 +14,14 @@ export default function TarotForCreatorsContent() {
       <section className="seo-hero">
         <h1>{t('creatorsHeroTitle')}</h1>
         <p>{t('creatorsHeroBody')}</p>
-        <Link className="seo-cta" href="/">
-          {t('creatorsHeroCta')}
-        </Link>
+        <div className="seo-cta-row">
+          <Link className="seo-cta" href="/">
+            {t('creatorsHeroCta')}
+          </Link>
+          <Link className="seo-cta seo-cta-secondary" href="/tarot-card-meanings">
+            {t('cardMeaningsEntry')}
+          </Link>
+        </div>
       </section>
 
       <section className="seo-section">

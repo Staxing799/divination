@@ -14,9 +14,14 @@ export default function TarotReadingOnlineContent() {
       <section className="seo-hero">
         <h1>{t('onlineHeroTitle')}</h1>
         <p>{t('onlineHeroBody')}</p>
-        <Link className="seo-cta" href="/">
-          {t('onlineHeroCta')}
-        </Link>
+        <div className="seo-cta-row">
+          <Link className="seo-cta" href="/">
+            {t('onlineHeroCta')}
+          </Link>
+          <Link className="seo-cta seo-cta-secondary" href="/tarot-card-meanings">
+            {t('cardMeaningsEntry')}
+          </Link>
+        </div>
       </section>
 
       <section className="seo-section">

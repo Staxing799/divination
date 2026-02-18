@@ -14,9 +14,14 @@ export default function ThreeCardTarotContent() {
       <section className="seo-hero">
         <h1>{t('spreadHeroTitle')}</h1>
         <p>{t('spreadHeroBody')}</p>
-        <Link className="seo-cta" href="/">
-          {t('spreadHeroCta')}
-        </Link>
+        <div className="seo-cta-row">
+          <Link className="seo-cta" href="/">
+            {t('spreadHeroCta')}
+          </Link>
+          <Link className="seo-cta seo-cta-secondary" href="/tarot-card-meanings">
+            {t('cardMeaningsEntry')}
+          </Link>
+        </div>
       </section>
 
       <section className="seo-section">

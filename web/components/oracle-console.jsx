@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   acceptLegalConsent,
@@ -735,6 +736,9 @@ export default function OracleConsole() {
               </button>
             ))}
           </div>
+          <Link href="/tarot-card-meanings" className="ghost-btn">
+            {copy.cardMeaningsEntry}
+          </Link>
           {authenticated && (
             <button type="button" className="ghost-btn" onClick={handleLogout}>
               {copy.logout}
@@ -982,6 +986,10 @@ export default function OracleConsole() {
       </main>
 
       {!authenticated && <HomeSeoContent />}
+      <footer className="site-footer">
+        <p>{copy.footerLine}</p>
+        <p className="footer-line">仅供娱乐（For entertainment purposes only）</p>
+      </footer>
 
       {authModalOpen && !authenticated && (
         <div className="auth-modal-backdrop" role="presentation" onClick={closeAuthModal}>

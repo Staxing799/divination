@@ -1192,6 +1192,59 @@ textarea:focus {
   font-size: clamp(1.2rem, 3vw, 1.55rem);
 }
 
+.tarot-meaning-grid {
+  margin-top: 0.72rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+
+.tarot-meaning-item {
+  border-radius: 0.92rem;
+  border: 1px solid rgba(236, 198, 108, 0.22);
+  background: rgba(16, 8, 36, 0.7);
+  padding: 0.8rem;
+}
+
+.tarot-meaning-item h3 {
+  margin: 0;
+  font-family: var(--font-heading), serif;
+  font-size: 1.04rem;
+  color: #ffebbc;
+}
+
+.tarot-meaning-item h3 a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 228, 166, 0.36);
+}
+
+.tarot-meaning-item h3 a:hover {
+  border-bottom-color: rgba(255, 228, 166, 0.72);
+}
+
+.tarot-meaning-item p {
+  margin: 0.46rem 0 0;
+  color: #d8caef;
+  line-height: 1.66;
+  font-size: 0.87rem;
+}
+
+.tarot-meaning-meta {
+  color: #b39bd7;
+  font-size: 0.78rem;
+}
+
+.tarot-meaning-article p {
+  margin: 0;
+  color: #e4d8f7;
+  line-height: 1.86;
+}
+
+.tarot-meaning-article p + p {
+  margin-top: 0.86rem;
+}
+
 .seo-cta {
   margin-top: 0.8rem;
   display: inline-block;
@@ -1201,6 +1254,23 @@ textarea:focus {
   background: linear-gradient(90deg, var(--gold), var(--gold-strong));
   border-radius: 999px;
   padding: 0.62rem 0.95rem;
+}
+
+.seo-cta-row {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.seo-cta-row .seo-cta {
+  margin-top: 0;
+}
+
+.seo-cta-secondary {
+  color: #ffe8ba;
+  border: 1px solid rgba(236, 198, 108, 0.36);
+  background: linear-gradient(130deg, rgba(46, 19, 88, 0.82), rgba(24, 12, 56, 0.8));
 }
 
 button:disabled {
@@ -1244,6 +1314,10 @@ button:disabled {
   }
 
   .seo-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tarot-meaning-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1301,6 +1375,10 @@ button:disabled {
   .ritual-modal-actions .ghost-btn,
   .ritual-modal-actions .danger-btn {
     width: 100%;
+  }
+
+  .seo-cta-row {
+    flex-direction: column;
   }
 }
 
