@@ -10,8 +10,8 @@ export function normalizeLanguage(input) {
 
 export const COPY = {
   en: {
-    brandName: 'Arcana Noire',
-    brandTagline: 'The Veiled Tarot Atelier',
+    brandName: 'AI Tarot Reading',
+    brandTagline: 'Free AI Tarot Divination Online',
     heroTitle: 'Your answer is waiting behind the veil.',
     heroSubtitle:
       'Arcana Noire reads Tarot as a coded mirror for your present crossroad, so you can move with precision instead of noise.',
@@ -84,7 +84,7 @@ export const COPY = {
     globalLoading: 'Loading...',
     homeSeoCard1Title: 'Online Tarot Reading That Follows Real Spread Logic',
     homeSeoCard1Body:
-      'Arcana Noire is built for users searching for free tarot reading online with practical clarity. Every reading uses a structured three-card spread, so results are consistent, readable, and actionable.',
+      'AI Tarot Reading is built for users searching for free tarot reading online and free AI tarot guidance. Every reading uses a structured three-card spread, so results are consistent, readable, and actionable.',
     homeSeoCard2Title: 'Three Card Tarot Spread: Past, Present, Future',
     homeSeoCard2Body:
       'Learn how to interpret past present future tarot positions and use upright and reversed cards for better decisions.',
@@ -93,9 +93,9 @@ export const COPY = {
     homeSeoCard3Body:
       'Use tarot for product strategy, creative blocks, and relationship decisions without vague advice loops.',
     homeSeoCard3Link: 'Explore creator-focused tarot',
-    homeSeoCard4Title: 'Start a Free Tarot Reading Online',
+    homeSeoCard4Title: 'Start a Free AI Tarot Reading Online',
     homeSeoCard4Body:
-      'If you searched for online tarot reading or three card tarot spread online, this is your best starting point.',
+      'If you searched for AI tarot reading, online tarot reading, or three card tarot spread online, this is your best starting point.',
     homeSeoCard4Link: 'Go to tarot reading landing page',
     creatorsHeroTitle: 'Tarot for Creators, Builders, and Founders',
     creatorsHeroBody:
@@ -110,9 +110,9 @@ export const COPY = {
     creatorsSection3Title: 'What to Expect From Arcana Noire',
     creatorsSection3Body:
       'A cinematic Tarot experience, structured spread logic, and practical guidance in plain language for global users across English, Chinese, Spanish, and Japanese.',
-    onlineHeroTitle: 'Free Tarot Reading Online for Real-World Decisions',
+    onlineHeroTitle: 'Free AI Tarot Reading Online for Real-World Decisions',
     onlineHeroBody:
-      'Arcana Noire gives you a structured online Tarot reading with a classic 3-card spread. It is built for people who want practical clarity in love, work, and life direction.',
+      'AI Tarot Reading gives you a structured online Tarot reading with a classic 3-card spread. It is built for people who want practical clarity in love, work, and life direction.',
     onlineHeroCta: 'Start Your Tarot Reading',
     onlineSection1Title: 'Why This Tarot Reading Is Different',
     onlineSection1Body:
@@ -139,8 +139,8 @@ export const COPY = {
     localeLabel: 'Language'
   },
   zh: {
-    brandName: 'Arcana Noire 黑典秘仪',
-    brandTagline: '帷幕后的高阶塔罗',
+    brandName: 'AI 免费塔罗占卜',
+    brandTagline: '免费 AI 塔罗牌在线解读',
     heroTitle: '你的答案，藏在帷幕之后。',
     heroSubtitle: 'Arcana Noire 以塔罗为镜，解读你当下最关键的命运信号，让你在未知里看清方向。',
     heroAudience1: '象征思维者',
@@ -211,7 +211,7 @@ export const COPY = {
     globalLoading: '加载中...',
     homeSeoCard1Title: '遵循真实牌阵逻辑的在线塔罗',
     homeSeoCard1Body:
-      'Arcana Noire 为追求清晰度的用户打造免费在线塔罗体验。每次解读都采用标准三张牌阵，结果稳定、清晰、可执行。',
+      'AI 免费塔罗占卜为追求清晰度的用户打造免费在线体验。每次解读都采用标准三张牌阵，让 AI 塔罗牌结果更稳定、清晰、可执行。',
     homeSeoCard2Title: '三张牌阵：过去、现在、未来',
     homeSeoCard2Body:
       '学习如何解读过去/现在/未来位置，并结合正逆位做出更有质量的决策。',
@@ -220,9 +220,9 @@ export const COPY = {
     homeSeoCard3Body:
       '把塔罗用于产品策略、创作卡点和关系决策，避免空泛建议循环。',
     homeSeoCard3Link: '查看创作者专题',
-    homeSeoCard4Title: '立即开始免费在线塔罗',
+    homeSeoCard4Title: '立即开始免费 AI 塔罗占卜',
     homeSeoCard4Body:
-      '如果你在找在线塔罗或三张牌阵在线解读，这里就是最好的起点。',
+      '如果你在找 AI 塔罗牌、在线塔罗或三张牌阵在线解读，这里就是最好的起点。',
     homeSeoCard4Link: '进入在线塔罗页面',
     creatorsHeroTitle: '给创作者、建设者与创业者的塔罗',
     creatorsHeroBody:
@@ -237,9 +237,9 @@ export const COPY = {
     creatorsSection3Title: '你将从 Arcana Noire 得到什么',
     creatorsSection3Body:
       '电影感体验、结构化牌阵逻辑，以及面向全球用户的清晰实用建议。',
-    onlineHeroTitle: '面向真实决策的免费在线塔罗',
+    onlineHeroTitle: '面向真实决策的免费 AI 塔罗牌占卜',
     onlineHeroBody:
-      'Arcana Noire 提供结构化在线塔罗，采用经典三张牌阵。适合在感情、工作和人生方向上寻求务实洞察的人。',
+      'AI 免费塔罗占卜提供结构化在线塔罗，采用经典三张牌阵。适合在感情、工作和人生方向上寻求务实洞察的人。',
     onlineHeroCta: '开始你的塔罗解读',
     onlineSection1Title: '这套在线塔罗有何不同',
     onlineSection1Body:
@@ -266,7 +266,7 @@ export const COPY = {
     localeLabel: '语言'
   },
   es: {
-    brandName: 'Arcana Noire',
+    brandName: 'AI Tarot Reading',
     brandTagline: 'Atelier de Tarot Velado',
     heroTitle: 'Tu respuesta espera detras del velo.',
     heroSubtitle:
@@ -383,7 +383,7 @@ export const COPY = {
     localeLabel: 'Idioma'
   },
   ja: {
-    brandName: 'Arcana Noire',
+    brandName: 'AI Tarot Reading',
     brandTagline: 'ヴェールの奥のタロット工房',
     heroTitle: '答えは、ヴェールの向こうにある。',
     heroSubtitle:

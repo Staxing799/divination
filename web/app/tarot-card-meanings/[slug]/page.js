@@ -62,11 +62,11 @@ export default async function TarotMeaningArticlePage({ params }) {
     wordCount: article.charCount,
     author: {
       '@type': 'Organization',
-      name: 'Arcana Noire'
+      name: 'AI Tarot Reading'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Arcana Noire'
+      name: 'AI Tarot Reading'
     }
   };
 

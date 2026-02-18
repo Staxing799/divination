@@ -4,26 +4,30 @@ import { resolveSiteUrl } from '../../lib/site-url';
 const siteUrl = resolveSiteUrl();
 
 export const metadata = {
-  title: 'Free Tarot Reading Online | Ask and Draw 3 Tarot Cards',
+  title: 'Free AI Tarot Reading Online | AI塔罗牌免费占卜',
   description:
-    'Get a free tarot reading online. Ask one question and draw a three-card spread (Past, Present, Future) for love, career, and life clarity.',
+    'Get a free AI tarot reading online. Ask one question and draw a three-card spread (Past, Present, Future) for love, career, and life clarity. 支持 AI 塔罗牌免费占卜。',
   alternates: {
     canonical: '/tarot-reading-online'
   },
   openGraph: {
-    title: 'Free Tarot Reading Online | Ask and Draw 3 Tarot Cards',
+    title: 'Free AI Tarot Reading Online | AI塔罗牌免费占卜',
     description:
-      'Ask one question and draw a three-card tarot spread for love, career, and life clarity.',
+      'Ask one question and draw a three-card AI tarot spread for love, career, and life clarity.',
     url: `${siteUrl}/tarot-reading-online`,
     type: 'article'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Tarot Reading Online | Ask and Draw 3 Tarot Cards',
+    title: 'Free AI Tarot Reading Online | AI塔罗牌免费占卜',
     description:
-      'Ask one question and draw a three-card tarot spread for love, career, and life clarity.'
+      'Ask one question and draw a three-card AI tarot spread for love, career, and life clarity.'
   },
   keywords: [
+    'ai tarot reading',
+    'free ai tarot reading',
+    'ai tarot card reading',
+    'ai tarot reading online',
     'free tarot reading online',
     'online tarot reading',
     'tarot reading free',
@@ -35,6 +39,10 @@ export const metadata = {
     'daily tarot reading online',
     'tarot reading for beginners',
     'free tarot card reading no signup',
+    'ai塔罗牌',
+    'ai塔罗占卜',
+    '免费ai塔罗牌',
+    'ai塔罗牌在线',
     '塔罗在线占卜',
     '免费塔罗占卜',
     '塔罗牌在线解读'
@@ -76,9 +84,9 @@ export default function TarotReadingOnlinePage() {
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: 'Free Tarot Reading Online: A Practical 3-Card Method',
+    headline: 'Free AI Tarot Reading Online: A Practical 3-Card Method',
     description:
-      'A practical guide to online tarot reading with a Past, Present, Future spread for clearer decisions.',
+      'A practical guide to AI tarot reading online with a Past, Present, Future spread for clearer decisions.',
     mainEntityOfPage: `${siteUrl}/tarot-reading-online`
   };
 

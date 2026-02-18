@@ -31,12 +31,17 @@ export const metadata = {
     apple: [{ url: '/icon.png', sizes: '64x64' }]
   },
   title: {
-    default: 'Free Tarot Reading Online | 3-Card Tarot Spread',
-    template: '%s | Tarot Reading Online'
+    default: 'AI Tarot Reading Free | 免费AI塔罗牌占卜',
+    template: '%s | AI Tarot Reading'
   },
   description:
-    'Free online tarot reading with a three-card spread. Ask one question and get clear past, present, future guidance for love, career, and life decisions.',
+    'Free AI tarot card reading online. 免费AI塔罗牌占卜，支持三张牌阵（过去/现在/未来），用于感情、事业与人生决策参考。',
   keywords: [
+    'ai tarot reading',
+    'ai tarot',
+    'free ai tarot reading',
+    'ai tarot card reading',
+    'ai tarot reading online',
     'free tarot reading online',
     'tarot reading free',
     'tarot reading online',
@@ -54,6 +59,11 @@ export const metadata = {
     'upright and reversed tarot',
     'best tarot reading website',
     'online divination',
+    'ai塔罗牌',
+    'ai塔罗',
+    'ai塔罗占卜',
+    '免费ai塔罗牌占卜',
+    'ai塔罗牌在线',
     '塔罗在线占卜',
     '免费塔罗',
     '三张牌塔罗',
@@ -63,19 +73,19 @@ export const metadata = {
     canonical: '/'
   },
   openGraph: {
-    title: 'Free Tarot Reading Online | 3-Card Tarot Spread',
+    title: 'AI Tarot Reading Free | 免费AI塔罗牌占卜',
     description:
-      'Free online tarot reading for love, career, and life. Try a practical three-card spread with clear guidance.',
+      'AI-powered free tarot reading online with a practical 3-card spread for love, career, and life.',
     url: siteUrl,
-    siteName: 'Tarot Reading Online',
+    siteName: 'AI Tarot Reading',
     locale: 'en_US',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Tarot Reading Online | 3-Card Tarot Spread',
+    title: 'AI Tarot Reading Free | 免费AI塔罗牌占卜',
     description:
-      'Free online tarot reading for love, career, and life. Try a practical three-card spread with clear guidance.'
+      'AI-powered free tarot reading online with a practical 3-card spread for love, career, and life.'
   },
   robots: {
     index: true,

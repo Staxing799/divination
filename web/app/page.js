@@ -7,18 +7,20 @@ export default function HomePage() {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Free Tarot Reading Online',
+    name: 'AI Tarot Reading | 免费AI塔罗牌占卜',
+    alternateName: ['Free AI Tarot Reading', 'AI塔罗牌', '免费AI塔罗占卜'],
     url: siteUrl,
     description:
-      'Free online tarot reading with practical three-card guidance for real decisions.',
+      'AI-powered free tarot card reading online with practical three-card guidance for real decisions.',
     inLanguage: ['en', 'zh', 'es', 'ja']
   };
 
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Online Tarot Reading Tool',
+    name: 'AI Tarot Card Reading Tool',
     applicationCategory: 'LifestyleApplication',
+    applicationSubCategory: 'AI Tarot Reading',
     operatingSystem: 'Web',
     offers: {
       '@type': 'Offer',
