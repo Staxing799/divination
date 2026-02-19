@@ -22,19 +22,7 @@ export const metadata = {
     title: 'Tarot for Work Decisions | Creators, Founders, and Entrepreneurs',
     description:
       'Use Tarot as a reflection framework for strategy, timing, and difficult creative decisions.'
-  },
-  keywords: [
-    'tarot for creators',
-    'tarot for entrepreneurs',
-    'tarot for business decisions',
-    'creative block tarot reading',
-    'career decision tarot reading',
-    'startup founder tarot guidance',
-    'product strategy tarot',
-    'work and life tarot reading',
-    '事业塔罗',
-    '工作决策塔罗'
-  ]
+  }
 };
 
 export default function TarotForCreatorsPage() {

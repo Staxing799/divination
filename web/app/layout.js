@@ -36,39 +36,6 @@ export const metadata = {
   },
   description:
     'Free AI tarot card reading online. 免费AI塔罗牌占卜，支持三张牌阵（过去/现在/未来），用于感情、事业与人生决策参考。',
-  keywords: [
-    'ai tarot reading',
-    'ai tarot',
-    'free ai tarot reading',
-    'ai tarot card reading',
-    'ai tarot reading online',
-    'free tarot reading online',
-    'tarot reading free',
-    'tarot reading online',
-    'online tarot card reading',
-    'tarot yes or no',
-    'love tarot reading',
-    'career tarot reading',
-    'daily tarot reading',
-    'tarot cards meaning',
-    'tarot spread for beginners',
-    'three card tarot spread online',
-    'three card tarot spread',
-    'past present future tarot',
-    'how to read tarot cards',
-    'upright and reversed tarot',
-    'best tarot reading website',
-    'online divination',
-    'ai塔罗牌',
-    'ai塔罗',
-    'ai塔罗占卜',
-    '免费ai塔罗牌占卜',
-    'ai塔罗牌在线',
-    '塔罗在线占卜',
-    '免费塔罗',
-    '三张牌塔罗',
-    '塔罗牌解读'
-  ],
   alternates: {
     canonical: '/'
   },
@@ -89,7 +56,14 @@ export const metadata = {
   },
   robots: {
     index: true,
-    follow: true
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1
+    }
   }
 };
 

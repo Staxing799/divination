@@ -1034,6 +1034,27 @@ textarea:focus {
   margin-top: 0.2rem;
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  align-items: center;
+}
+
+.footer-links a {
+  color: #ffe6ad;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 230, 173, 0.46);
+}
+
+.footer-links a:hover {
+  border-bottom-color: rgba(255, 230, 173, 0.9);
+}
+
+.footer-links span {
+  color: #9ee6d8;
+}
+
 .footer-line {
   margin-top: 0.35rem;
   color: #f5e0a7;
@@ -1185,11 +1206,43 @@ textarea:focus {
   line-height: 1.72;
 }
 
+.seo-breadcrumb {
+  margin: 0 0 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.42rem;
+  color: #b9a2dc;
+  font-size: 0.82rem;
+}
+
+.seo-breadcrumb a {
+  color: #dfcdfb;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(223, 205, 251, 0.46);
+}
+
+.seo-breadcrumb a:hover {
+  border-bottom-color: rgba(223, 205, 251, 0.88);
+}
+
 .seo-section h2 {
   margin: 0;
   color: #ffe7b9;
   font-family: var(--font-heading), serif;
   font-size: clamp(1.2rem, 3vw, 1.55rem);
+}
+
+.seo-bullet-list {
+  margin: 0.72rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.seo-bullet-list li {
+  color: #e6daf8;
+  line-height: 1.7;
 }
 
 .tarot-meaning-grid {
@@ -1233,6 +1286,12 @@ textarea:focus {
 .tarot-meaning-meta {
   color: #b39bd7;
   font-size: 0.78rem;
+}
+
+.tarot-meaning-update {
+  margin-top: 0.5rem;
+  color: #a48ec7;
+  font-size: 0.84rem;
 }
 
 .tarot-meaning-article p {

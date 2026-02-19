@@ -705,6 +705,9 @@ export default function OracleConsole() {
   const ritualButtonText = ritualStatus === RITUAL_STATUSES.SELECTING
     ? (language === 'zh' ? '确认三张牌并揭示' : 'Confirm 3 cards and reveal')
     : (language === 'zh' ? '开始三张牌仪式' : 'Start 3-card ritual');
+  const footerNav = language === 'zh'
+    ? { about: '关于我们', methodology: '解读方法论', meanings: '牌义文章库' }
+    : { about: 'About', methodology: 'Methodology', meanings: 'Card Meanings' };
 
   return (
     <div className="site-shell">
@@ -988,6 +991,13 @@ export default function OracleConsole() {
       {!authenticated && <HomeSeoContent />}
       <footer className="site-footer">
         <p>{copy.footerLine}</p>
+        <p className="footer-links">
+          <Link href="/about">{footerNav.about}</Link>
+          <span>·</span>
+          <Link href="/tarot-reading-methodology">{footerNav.methodology}</Link>
+          <span>·</span>
+          <Link href="/tarot-card-meanings">{footerNav.meanings}</Link>
+        </p>
         <p className="footer-line">仅供娱乐（For entertainment purposes only）</p>
       </footer>
 

@@ -15,6 +15,16 @@ export default function HomePage() {
     inLanguage: ['en', 'zh', 'es', 'ja']
   };
 
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'AI Tarot Reading',
+    url: siteUrl,
+    logo: `${siteUrl}/nebula-arcana-logo.svg`,
+    description:
+      'A free AI tarot reading website with a structured three-card spread and practical interpretation guidance.'
+  };
+
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -29,37 +39,6 @@ export default function HomePage() {
     }
   };
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'What is the best way to do an online tarot reading?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Use one clear question and a structured spread. This tool uses a three-card Past, Present, Future layout with upright and reversed card orientation.'
-        }
-      },
-      {
-        '@type': 'Question',
-        name: 'Can beginners use this tarot reading tool?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes. The reading flow is beginner-friendly while preserving core tarot logic, including card position and orientation.'
-        }
-      },
-      {
-        '@type': 'Question',
-        name: 'Is this tarot app free?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes. The current reading experience is free to use for reflective guidance.'
-        }
-      }
-    ]
-  };
-
   return (
     <>
       <script
@@ -68,9 +47,12 @@ export default function HomePage() {
       />
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
       />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <OracleConsole />
     </>
   );

@@ -3,50 +3,24 @@ import { tarotMeaningArticles } from '../lib/tarot-meaning-articles';
 
 export default function sitemap() {
   const siteUrl = resolveSiteUrl();
-  const now = new Date();
-
-  const staticPages = [
-    {
-      url: siteUrl,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 1
-    },
-    {
-      url: `${siteUrl}/tarot-reading-online`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9
-    },
-    {
-      url: `${siteUrl}/three-card-tarot-spread`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.85
-    },
-    {
-      url: `${siteUrl}/tarot-for-creators`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8
-    }
+  const staticPaths = [
+    '/',
+    '/tarot-reading-online',
+    '/three-card-tarot-spread',
+    '/tarot-for-creators',
+    '/tarot-card-meanings',
+    '/tarot-card-meanings/top-10',
+    '/about',
+    '/tarot-reading-methodology'
   ];
 
-  const meaningPages = tarotMeaningArticles.map((article) => ({
-    url: `${siteUrl}/tarot-card-meanings/${article.slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.72
+  const staticPages = staticPaths.map((path) => ({
+    url: `${siteUrl}${path === '/' ? '' : path}`
   }));
 
-  return [
-    ...staticPages,
-    {
-      url: `${siteUrl}/tarot-card-meanings`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.86
-    },
-    ...meaningPages
-  ];
+  const meaningPages = tarotMeaningArticles.map((article) => ({
+    url: `${siteUrl}/tarot-card-meanings/${article.slug}`
+  }));
+
+  return [...staticPages, ...meaningPages];
 }
